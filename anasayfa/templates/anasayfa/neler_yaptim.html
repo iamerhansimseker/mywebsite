@@ -1,0 +1,247 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Neler Yaptım</title>
+    <style>
+
+        .language-buttons {
+            position: fixed;
+            top: 16px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            gap: 12px;
+        }
+
+        .language-buttons img {
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .language-buttons img:hover {
+            transform: scale(1.1);
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url("{% static 'wallpaper-2.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .content {
+            margin-top: 100px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 40px 60px;
+            border-radius: 14px;
+            text-align: center;
+            max-width: 600px;
+            opacity: 0;
+            transform: translateX(-100%);
+            animation: slideIn 0.5s ease-out forwards;
+        }
+
+        h1, .sub-buttons, .button-wrapper {
+            opacity: 0;
+            transform: translateX(-100%);
+            animation: slideIn 0.8s ease-out forwards;
+        }
+
+        h1 {
+            animation-delay: 0.2s;
+        }
+
+        .sub-buttons {
+            animation-delay: 0.6s;
+        }
+
+        .button-wrapper {
+            animation-delay: 0.8s;
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .sub-buttons {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .button {
+            background-color: white;
+            color: black;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: bold;
+            text-decoration: none;
+            opacity: 0;
+            transform: translateX(-100%);
+            animation: slideIn 0.5s ease-out forwards;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+
+        .button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.15);
+            transform: skewX(-20deg);
+            transition: left 0.5s;
+        }
+
+        .button:hover::before {
+            left: 100%;
+        }
+
+        .button:hover {
+            transform: translateX(0) scale(1.03);
+            background-color: black;
+            color: white;
+        }
+
+        .button:nth-child(1) {
+            animation-delay: 0.5s;
+        }
+
+        .button:nth-child(2) {
+            animation-delay: 0.8s;
+        }
+
+        .button-wrapper {
+            margin: 45px 0 25px;
+        }
+
+        .back-button {
+            background: #fff;
+            color: #000;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease-in-out;
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .back-button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.05); /* hafif bir gölge/parlama efekti */
+            opacity: 0;
+            transition: opacity 0.3s;
+            border-radius: inherit;
+            z-index: 1;
+        }
+
+        .back-button:hover::before {
+            opacity: 1;
+        }
+
+        .back-button span {
+            position: relative;
+            z-index: 2;
+        }
+
+        .back-button:hover {
+            background: #000;
+            color: #fff;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
+        }
+
+
+
+        /* Çok satırlı daktilo efekti */
+        .typewriter {
+            display: inline-block;
+            overflow: hidden;
+            font-size: 16px;
+            font-weight: normal;
+            text-align: left;
+            margin-top: 20px;
+            animation: blink 0.7s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { border-color: transparent; }
+            50% { border-color: white; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Dil Seçim Butonları -->
+    <div class="language-buttons">
+        <a href="{% url 'neler_yaptim' %}">
+            <img src="{% static 'tr.png' %}" alt="Türkçe">
+        </a>
+        <a href="{% url 'what_I_did' %}">
+            <img src="{% static 'en.png' %}" alt="English">
+        </a>
+    </div>
+    <div class="content">
+        <h1>Neler Yaptım</h1>
+        <p id="typing-text" class="typewriter"></p>
+
+        <div class="sub-buttons">
+            <a href="{% url 'deneyimlerim' %}" class="button">Deneyimlerim</a>
+            <a href="{% url 'projelerim' %}" class="button">Yaptığım Projeler</a>
+        </div>
+    </div>
+
+    <div class="button-wrapper">
+        <a href="{% url 'merhaba' %}" class="back-button">Ana Sayfaya Dön</a>
+    </div>
+
+    <script>
+        const text = "Bu bölüm, yalnızca bir özgeçmiş değil; fikirlerin gerçeğe, eğitimlerin deneyime ve projelerin tutkuya dönüştüğü yolculuğumun haritası. Her staj, her proje ve her öğrenme anı, beni bugünkü ben yapan kilometre taşlarıydı. Şimdi sizi bu yolculuğun satır aralarına davet ediyorum.";
+        const typingElement = document.getElementById('typing-text');
+
+        let i = 0;
+        function typeWriter() {
+            if (i < text.length) {
+                typingElement.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(typeWriter, 25); // yazma hızı (ms)
+            }
+        }
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                typeWriter();
+            }, 1000); // diğer animasyonlardan sonra başlasın
+        });
+    </script>
+
+</body>
+</html>

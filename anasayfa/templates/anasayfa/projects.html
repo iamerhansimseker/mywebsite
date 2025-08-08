@@ -1,0 +1,1102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Projects</title>
+    <style>
+        /* Modern font */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+
+        /* Modal içindeki küçük ikonlar için */
+        .icon {
+        width: 20px;
+        height: 20px;
+        vertical-align: middle;
+        margin-right: 8px;
+        fill: currentColor;
+        }
+        .language-buttons {
+            position: fixed;
+            top: 16px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            gap: 12px;
+        }
+
+        .language-buttons img {
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .language-buttons img:hover {
+            transform: scale(1.1);
+        }
+        body {
+            margin: 0;
+            padding: 40px 10px 100px 10px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url("{% static 'wallpaper-2.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+        }
+
+        .intro-box {
+            margin: 0 auto 30px auto;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px 30px;
+            max-width: 900px;
+            text-align: center;
+            border-left: 5px solid #ffd700;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .project-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 15px;
+            box-sizing: border-box;
+        }
+
+        .project-box {
+            cursor: zoom-in;
+            background-color: rgba(0, 0, 0, 0.7); /* Saydam siyah zemin */
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow:
+                0 4px 8px rgba(0, 0, 0, 0.3),
+                0 10px 20px rgba(0, 0, 0, 0.2),
+                inset 0 0 10px rgba(255, 255, 255, 0.05); /* içten hafif ışık */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            height: auto;
+            transform: perspective(1000px) rotateX(1deg) rotateY(-2deg);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .project-box:hover {
+            transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1.02);
+            box-shadow:
+                0 8px 16px rgba(0, 0, 0, 0.4),
+                0 16px 32px rgba(0, 0, 0, 0.3),
+                inset 0 0 15px rgba(255, 255, 255, 0.07);
+        }
+
+        .box-short {
+            min-height: 300px;
+        }
+
+
+        .box-tall {
+            min-height: 520px;
+        }
+
+        .project-button {
+            background: linear-gradient(135deg, #ffd700, #ffcc00);
+            color: #000;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+            transition: all 0.3s ease-in-out;
+            position: relative;
+            overflow: hidden;
+            display: block;
+            text-align: center;
+        }
+
+        .project-button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: skewX(-20deg);
+            transition: left 0.5s;
+        }
+
+        .project-button:hover::before {
+            left: 100%;
+        }
+
+        .project-button:hover {
+            background: #000;
+            color: #fff;
+            box-shadow: 0 4px 25px rgba(255, 255, 255, 0.2);
+        }
+
+        .project-desc {
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .role-box {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #ffd700;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 14.5px;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .button-wrapper {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            gap: 20px;
+            z-index: 9999;
+        }
+
+
+
+        .nav-button {
+            background: #fff;
+            color: #000;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease-in-out;
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .nav-button:hover {
+            background-color: black;
+            color: white;
+        }
+
+        @media (max-width: 1000px) {
+            .project-container {
+                grid-template-columns: 1fr;
+                padding: 0 10px;
+                max-width: 100%;
+            }
+
+            .intro-box {
+                max-width: 100%;
+                padding: 15px 20px;
+            }
+        }
+
+        #scrollProgressContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background-color: rgba(255, 255, 255, 0.1);
+            z-index: 9999;
+        }
+
+        #scrollProgressBar {
+            height: 100%;
+            width: 0%;
+            background-color: #ffd700;
+            transition: width 0.25s ease-out;
+        }
+
+        /* Yeni Scroll Down Indicator Tasarımı */
+        .scroll-down-indicator {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 32px;
+            height: 32px;
+            animation: bounce 1.5s infinite;
+            z-index: 9999;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .scroll-down-indicator svg {
+            width: 100%;
+            height: 100%;
+            fill: #ffd700;
+            filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.6));
+        }
+
+        .scroll-down-indicator:hover {
+            opacity: 1;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        .hide-indicator {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Video Container ve Play Button Stilleri */
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-height: 400px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: black;
+        }
+
+        .video-container video {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+            display: block;
+        }
+
+
+        .hidden-media {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 10, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 95vh;
+            overflow-y: auto;
+            color: white;
+            position: relative;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            font-size: 28px;
+            cursor: pointer;
+            color: white;
+        }
+        .modal-2-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            padding: 20px;
+            overflow-y: auto;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-2-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-2-content {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            color: white;
+            position: relative;
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-2-overlay.active .modal-2-content {
+            transform: scale(1);
+        }
+
+        .modal-2-close {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #ccc;
+            transition: color 0.2s ease;
+        }
+
+        .modal-2-close:hover {
+            color: #ff6b6b;
+        }
+
+        .center-image-modal-2 {
+            width: 180px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            margin: 0 auto 20px;
+            display: block;
+        }
+
+        .modal-2-content h2 {
+            margin: 16px 0;
+            font-size: 26px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-2-content p {
+            font-size: 16px;
+            line-height: 1.5;
+            margin: 12px 0;
+            font-weight: 300;
+        }
+
+        .modal-2-content a {
+            color: #0e76a8;
+            text-decoration: none;
+        }
+
+        .modal-2-content a:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="language-buttons">
+        <a href="{% url 'projelerim' %}">
+            <img src="{% static 'tr.png' %}" alt="Türkçe">
+        </a>
+        <a href="{% url 'projects' %}">
+            <img src="{% static 'en.png' %}" alt="English">
+        </a>
+    </div>
+    <!--Scroll Bar-->
+    <div id="scrollProgressContainer">
+        <div id="scrollProgressBar"></div>
+    </div>    
+    <!-- Açıklama Kutusu -->
+
+    <div class="intro-box">
+        <strong>You can access the details and files of my projects by clicking on the titles. By clicking on the templates, you can view the related project in an isolated screen.</strong>
+    </div>
+    <!-- Projeler -->
+    <div class="project-container">
+
+        <!-- 1. Proje: Teslimat Dolabı (Uzun) -->
+        <div class="project-box box-short" data-project-id="tez">
+            <a href="{% url 'tez_en' %}" class="project-button">
+                THE PROBLEM OF IMPROVING ACCESSIBILITY AND PLACEMENT OF SMART DELIVERY LOCKERS IN ESKIŞEHIR TEPEBAŞI DISTRICT
+            </a>
+            <p class="project-desc">
+                This is a group project carried out as part of the Bachelor's Graduation Project. The aim is to present a <strong>comprehensive decision support system</strong> that aims to determine the most suitable locations for smart delivery lockers <strong>among 21 urban neighborhoods in the Eskişehir/Tepebaşı district</strong> using the Set Covering Problem and the TOPSIS method.
+
+                The solution process includes prioritizing neighborhoods based on their demographic characteristics using the TOPSIS method, calculating distances between neighborhoods to create a coverage matrix, and using the Set Covering optimization model to <strong>maximize coverage with the minimum number of lockers</strong> and to <strong>prioritize the selected centers</strong>.
+
+                Through a <strong>visual and interactive HTML interface</strong>, users can select a coverage radius, and based on this selection, the <strong>system automatically performs the optimization</strong>. The <strong>Google Street View images of the selected centers are provided just one click away</strong>, ensuring a user-friendly and practical structure.
+
+                The results are presented both in table and map formats, offering a <strong>dynamic and integrated solution that provides decision-makers with accessibility-, efficiency-, and priority-based location suggestions</strong>.
+            </p>
+
+            <div class="role-box">
+                <strong>
+                My individual roles in this project included drawing neighborhood boundaries and converting geographic coordinates into a format processable by the model using ScribbleMaps and QGIS, creating visuals for the interface and the project fair poster using Adobe Photoshop, performing data analysis, developing the optimization model and coding structure using Python, and developing a Decision Support System with an HTML-based interface.
+                </strong>
+            </div>
+
+            <!-- Şablonun içinde, yazıların altında altlı üstlü görseller -->
+            <div style="margin-top: 20px;">
+                <img src="{% static 'documents/tez-poster.jpeg' %}" alt="Tez Poster"
+                    style="width: 100%; height: auto; max-height: 650px; object-fit: contain; border-radius: 10px; margin-bottom: 12px;">
+                <img src="{% static 'documents/tez-1.jpeg' %}" alt="Tez Görseli 1"
+                    style="width: 100%; height: auto; max-height: 500px; object-fit: contain; border-radius: 10px;">
+            </div>
+            <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                <strong>Original Language:</strong>
+                <img src="{% static 'tr.png' %}" alt="Türk Bayrağı" style="height: 1.5em; vertical-align: middle;">
+            </div>
+        </div>
+
+
+        <!-- PROJELERİM SAYFASINDAKİ STAJ PROJE KUTUSU -->
+        <div class="project-box box-short" data-project-id="staj">
+            <a href="{% url 'staj_en' %}" class="project-button">
+                EnerjiSA - SPARK'24: PRINCIPLES OF PARALLEL OPERATION OF POWER TRANSFORMERS IN DISTRIBUTION NETWORKS
+            </a>
+            
+            <p class="project-desc">
+                Between the dates of 02.07.2024 - 30.07.2024, within the scope of my Mandatory Management Internship at EnerjiSA - Toroslar EDAŞ, this includes the <strong>parts I was responsible for and the work I carried out</strong> during the project we conducted together with my group members and our group coach Ahmet CANBOLAT. The objective was to determine whether <strong>temperature and humidity levels have an effect on the observed peak values of 14 step-down substations</strong> located in the Mersin Metropolitan Area in line with the <strong>principles of parallel connection of power transformers in distribution networks</strong>, and to provide prediction opportunities and analyze the results. In this context, data on <strong>daily peak values and transformer capacities, daily average temperature values, and daily average humidity rates</strong> between 01.01.2023 and 30.06.2024 were used.
+                In this context, data covering <strong>daily peak values and transformer capacities, daily average temperature values, and daily average humidity rates between 01.01.2023 and 30.06.2024</strong> were used.
+            </p>
+
+            <div class="role-box">
+                <strong>
+                My individual roles in this project included retrieving the data and preparing it for processing, performing regression analyses in Python to examine the effects of temperature and humidity levels on peak values, deriving regression equations for each transformer, and developing a Parameter-Based Power Predictor using these equations. Additionally, energy efficiency calculations were carried out based on the prediction results, critical transformers were identified through Pareto analysis according to the criteria of average active power and average occupancy rate, and the entire process was visually presented along with the preparation of a project introduction video.                </strong>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <img src="{% static 'documents/spark-sunumgrup.jpeg' %}" alt="Sunum Grubu" style="width: 50%; border-radius: 10px;">
+                    <img src="{% static 'documents/spark-r-p.jpeg' %}" alt="Regresyon Puan" style="width: 50%; border-radius: 10px;">
+                </div>
+                <!-- Video Container -->
+                <div class="video-container" style="position: relative; max-width: 100%; border-radius: 10px; overflow: hidden; margin-bottom: 15px;">
+                    <video id="customVideo" preload="metadata" controls
+                        style="width: 100%; border-radius: 10px; cursor: pointer;">
+                        <source src="{% static 'documents/spark-anim.mp4' %}" type="video/mp4">
+                        Tarayıcınız video etiketini desteklemiyor.
+                    </video>
+                    <div id="playButton" class="play-button" title="Oynat" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                        display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; background-color: rgba(0,0,0,0.5); border-radius: 50%; cursor: pointer;">
+                        <svg viewBox="0 0 24 24" fill="white" width="36" height="36">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <script>
+                    const video = document.getElementById('customVideo');
+                    const playButton = document.getElementById('playButton');
+
+                    let hasStarted = false;
+
+                    // Play butonuna tıklayınca videoyu oynat ve butonu gizle
+                    playButton.addEventListener('click', () => {
+                        if (!hasStarted) {
+                            video.play();
+                            hasStarted = true;
+                            playButton.style.display = 'none';
+                        }
+                    });
+
+                    // Video oynatılmaya başlayınca playButton gizlensin
+                    video.addEventListener('play', () => {
+                        playButton.style.display = 'none';
+                    });
+
+                    // Video durduğunda (kullanıcı durdurduysa) playButton görünmesin
+                    video.addEventListener('pause', () => {
+                        if (!video.ended) {
+                            // Butonu gösterme, video durduktan sonra tekrar başlamasın
+                        }
+                    });
+
+                    // Video bittiğinde playButton tekrar gösterilsin ve hasStarted sıfırlansın
+                    video.addEventListener('ended', () => {
+                        playButton.style.display = 'flex';
+                        hasStarted = false;
+                    });
+
+                    // Videoya ekrana tıklayınca oynatma/duraklatmayı engelle
+                    video.addEventListener('click', (e) => {
+                        e.preventDefault();
+                    });
+                </script>
+
+
+
+                <img src="{% static 'documents/spark-rs.jpeg' %}" alt="Regresyon Sıcaklık" 
+                    style="width: 100%; height: 560px; border-radius: 15px; object-fit: fill;">
+            </div>
+            <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                <strong>Original Language:</strong>
+                <img src="{% static 'tr.png' %}" alt="Türk Bayrağı" style="height: 1.5em; vertical-align: middle;">
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const projectBox = document.querySelector('.project-box.box-short[data-project-id="staj"]');
+                const video = projectBox.querySelector('video');
+                const playButton = projectBox.querySelector('#playButton');
+
+                // 1) Modal açma işlemi - sadece video dışına tıklanınca
+                projectBox.addEventListener('click', function(event) {
+                    // Eğer tıklanan öğe video veya video içindeyse modal açma
+                    if (event.target === video || video.contains(event.target) || event.target === playButton || playButton.contains(event.target)) {
+                        // Video veya play buttona tıklanmış, modal açma
+                        event.stopPropagation(); // modal açılmasını engelle
+                        return;
+                    }
+                    // Video dışına tıklanmışsa modal aç (buraya modal açma kodunu eklemelisin)
+                    // Örnek:
+                    // openModalForProject('staj');
+                    console.log('Modal açılacak: video dışı tıklama algılandı.');
+                });
+
+                // 2) Video üzerine gelince cursor pointer (zoomdan çıkacak)
+                video.style.cursor = 'pointer';
+
+                // 3) Video veya play buttona tıklanınca video oynat
+                function playVideo() {
+                    if (video.paused) {
+                        video.play();
+                        // Play button gizlensin
+                        if (playButton) playButton.style.display = 'none';
+                    } else {
+                        video.pause();
+                        if (playButton) playButton.style.display = 'flex';
+                    }
+                }
+
+                video.addEventListener('click', function(e) {
+                    playVideo();
+                    e.stopPropagation();
+                });
+
+                if (playButton) {
+                    playButton.addEventListener('click', function(e) {
+                        playVideo();
+                        e.stopPropagation();
+                    });
+                }
+            });
+        </script>
+
+        <!-- 3. Proje: SASA MAkro -->
+        <div class="project-box box-short" data-project-id="sasa1">
+            <a href="{% url 'sasamakro_en' %}" class="project-button">
+                SASA POLYESTER INC. – IMPROVEMENT STUDIES ON THE FIBER PRODUCTION PLANNING PROCESS USING EXCEL VBA & MACRO
+            </a>
+            <p class="project-desc">
+                Within the scope of my <strong>Mandatory Production Internship</strong> carried out at <strong>SASA Polyester Inc.</strong> between <strong>01.07.2025 – 30.07.2025</strong>, the <strong>Excel VBA codes and Macro assignments</strong> I developed were designed to automatically manage, update, and organize daily production plans and <strong>data downloaded from SAP</strong> in Excel files.
+                These codes automate tasks such as automatically highlighting the current date, filtering up-to-date data from stock, shipment, and balance files downloaded from the SAP system and transferring them to the relevant sheets, ensuring data integrity, verifying product codes, and alerting for missing entries — thereby eliminating <strong>manual operations</strong>.
+                This work was prepared as part of the <strong>process improvement studies</strong> I carried out during my internship at <strong>SASA Polyester</strong>, aiming to accelerate processes, reduce error rates, and increase data accuracy.            </p>
+            <div class="role-box">
+                <strong>As this project was conducted individually, all files and work are solely my own.</strong>
+            </div>
+            <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                <strong>Original Language:</strong>
+                <img src="{% static 'tr.png' %}" alt="Türk Bayrağı" style="height: 1.5em; vertical-align: middle;">
+            </div>
+        </div>
+
+        <!-- GAMS
+        <div class="project-box box-short" data-project-id="proje_sasa2">
+            <a href="{% url 'proje_veri' %}" class="project-button">
+                SASA GAMS
+            </a>
+            <p class="project-desc">
+                SASA'daki GAMS
+            </p>
+            <div class="role-box">
+                <strong>Bu proje bireysel bir çalışma olduğundan ötürü bütün dosyalar ve çalışmalar tarafıma aittir.</strong>
+            </div>
+            <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                <strong>Orijinal Dil:</strong>
+                <img src="{% static 'tr.png' %}" alt="Türk Bayrağı" style="height: 1.5em; vertical-align: middle;">
+            </div>
+        </div>
+        -->
+        <!-- 3. Proje: Veri Bilimi -->
+        <div class="project-box box-short" data-project-id="vb">
+            <a href="{% url 'veri_en' %}" class="project-button">
+                ENM421 - Introduction to Data Science: HEART DISEASE DETECTION
+            </a>
+            <p class="project-desc">
+                This study was carried out as part of the ENM421 - Introduction to Data Science course. In the project, heart disease data was analyzed through the steps of <strong>missing value handling, standardization of variables</strong>, and <strong>visualization</strong>. Then, the data was split into <strong>training</strong> and <strong>test</strong> sets, and a <strong>classification model was developed using the Random Forest algorithm</strong>.
+
+                The model’s performance was evaluated using metrics such as the <strong>confusion matrix, accuracy, precision, recall</strong>, and <strong>F1 score</strong>. Additionally, <strong>the importance of each variable in the model was analyzed</strong>, and the results were saved in a JSON file.
+
+                With this project, <strong>a successful model for predicting heart disease using data science techniques was developed</strong>.
+            </p>
+            <div class="role-box">
+                <strong>As this project was conducted individually, all files and work are solely my own.</strong>
+            </div>
+            <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                <strong>Original Language:</strong>
+                <img src="{% static 'tr.png' %}" alt="Türk Bayrağı" style="height: 1.5em; vertical-align: middle;">
+            </div>
+        </div>
+        <!-- 4. Proje: Network  -->
+        <div class="project-box box-short" data-project-id="network">
+            <a href="{% url 'network_en' %}" class="project-button">
+            ENM326 - Network Optimization and Algorithms: NURSE STAFF SCHEDULING </a>
+            <p class="project-desc">
+                This study was carried out as part of the ENM326 - Network Optimization and Algorithms course. In the project, a <strong>maximum flow optimization model</strong> was developed by considering <strong>nurse requirements for different shifts</strong> and <strong>departments</strong>, as well as <strong>capacity limits</strong> and <strong>demands</strong>.
+
+                In the model, <strong>flow variables</strong> between <strong>shifts</strong> and <strong>departments</strong> were defined, <strong>upper and lower bounds</strong> and <strong>demand constraints</strong> were introduced, and an <strong>objective function was formulated to minimize the total number of nurses</strong>.
+
+                The model was solved using <strong>Gurobi</strong>, the obtained <strong>optimal flow values were interpreted</strong>, and the <strong>results were visualized in layers through a detailed network graph</strong>.
+
+                Thus, <strong>the allocation of nurses to shifts and departments was optimized, enabling efficient use of resources</strong>.
+            </p>
+            <div class="role-box">
+                <strong>In this project, I was responsible for carrying out the coding process, preparing the report, and creating the presentation. I also undertook the tasks of conducting network simulations and performing performance analyses.</strong>
+            </div>
+            <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                <strong>Original Language:</strong>
+                <img src="{% static 'en.png' %}" alt="Türk Bayrağı" style="height: 1.5em; vertical-align: middle;">
+            </div>
+        </div>
+        <!-- 5. Proje: Project -->
+        <div class="project-box box-short" data-project-id="pp">
+            <a href="{% url 'project_planning_en' %}" class="project-button">
+            ENM448 - Project Planning and Management: FILM GALA PLANNING</a>
+            <p class="project-desc">
+                Within the scope of the ENM448 - Project Planning and Management course, a <strong>sample project management plan</strong> based on a film premiere event was designed. In this context, the core phases of project management—<strong>planning, organization</strong>, and <strong>execution</strong>—were analyzed in detail. A comprehensive <strong>project plan</strong> was developed by focusing on elements such as <strong>venue selection, security measures, media and promotional activities, technical infrastructure requirements, logistics services</strong>, and <strong>guest management</strong>. Additionally, project management tools such as a <strong>timeline, task distribution</strong>, and <strong>critical path analysis</strong> were utilized to evaluate the project's feasibility. This process <strong>contributed to the development of my theoretical knowledge and skills in project management</strong>.
+            </p>
+            <div class="role-box">
+                <strong>In this project, I took on the roles of preparing the presentation, Project Manager, Logistics Manager, and Media & Communication Manager.</strong>
+            </div>
+            <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                <strong>Original Language:</strong>
+                <img src="{% static 'en.png' %}" alt="Türk Bayrağı" style="height: 1.5em; vertical-align: middle;">
+            </div>
+        </div>
+        <!-- 9. Proje: Regresyon -->
+        <div class="project-box box-short" data-project-id="regresyon">
+            <a href="{% url 'reg_en' %}" class="project-button">
+                ENM310 - Design of Experiments and Regression Analysis: TEA - TEMPERATURE - TIME 
+            </a>
+            <p class="project-desc">
+                Within the scope of the ENM310 - Design of Experiments and Regression Analysis course, a project was conducted to examine <strong>the effects of brewing tea under different conditions on taste</strong>. Three different factors—<strong>type of tea, water temperature</strong>, and <strong>brewing time</strong>—and their effects at two levels were analyzed. The <strong>taste score</strong> was considered as the output variable, and evaluations were made using statistical methods such as <strong>analysis of variance (ANOVA), interaction plots</strong>, and the <strong>Tukey test</strong>. According to the findings, <strong>all three factors had statistically significant effects on the taste of the tea; however, the interactions between these factors were found to be insignificant</strong>. Through this project, <strong>I had the opportunity to enhance my theoretical knowledge and analytical skills in experimental design and multi-factor data analysis</strong>.
+            <div class="role-box">
+                <strong>In this project, my roles included preparing the presentation, performing the necessary statistical method calculations, and interpreting the results.</strong>
+            </div>
+            <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                <strong>Original Language:</strong>
+                <img src="{% static 'tr.png' %}" alt="Türk Bayrağı" style="height: 1.5em; vertical-align: middle;">
+            </div>
+        </div>
+        <!-- MyWebsite -->
+        <div class="project-box box-short" data-open="website-modal-2" tabindex="0" role="button" aria-controls="website-modal-2">
+            <a href="#" class="project-button" data-open="website-modal-2">
+                MyWebsite – This Website I Created as a Portfolio
+            </a>
+            <p class="project-desc">
+
+            </p>
+            <div class="role-box">
+                <strong>Click here for more information.</strong>
+            </div>
+        </div>
+    <!-- Sayfa Altı Navigasyon -->
+    <div class="button-wrapper">
+        <a href="{% url 'what_I_did' %}" class="nav-button">Back to Previous Page</a>
+        <a href="{% url 'hello' %}" class="nav-button">Back to Homepage</a>
+    </div>
+
+    <!-- Scroll Bar Script -->
+    <script>
+        window.onscroll = function () {
+            var winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+            var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            var scrolled = (winScroll / height) * 100;
+            document.getElementById("scrollProgressBar").style.width = scrolled + "%";
+
+            var scrollDown = document.getElementById("scrollDownIndicator");
+            var scrollUp = document.getElementById("scrollUpIndicator");
+
+            if (winScroll + window.innerHeight >= document.body.scrollHeight * 0.95) {
+                scrollDown.classList.add("hide-indicator");
+                scrollUp.classList.remove("hide-indicator"); // En alt kısımda scroll-up göster
+            } else {
+                scrollDown.classList.remove("hide-indicator");
+                scrollUp.classList.add("hide-indicator"); // Alt kısımda değilsek scroll-up gizle
+            }
+        };
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const downIndicator = document.getElementById("scrollDownIndicator");
+            const upIndicator = document.getElementById("scrollUpIndicator");
+
+            if (downIndicator) {
+                downIndicator.addEventListener("click", function () {
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                });
+            }
+
+            if (upIndicator) {
+                upIndicator.addEventListener("click", function () {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
+        });
+    </script>
+
+    <!-- Video Play Button Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const video = document.getElementById("customVideo");
+            const playButton = document.getElementById("playButton");
+
+            playButton.addEventListener("click", function () {
+                if (video.paused) {
+                    video.play();
+                    playButton.style.display = "none";
+                }
+            });
+
+            video.addEventListener("pause", function () {
+                playButton.style.display = "flex";
+            });
+
+            video.addEventListener("ended", function () {
+                playButton.style.display = "flex";
+            });
+        });
+    </script>
+
+    <!-- Estetik Scroll Down Indicator (SVG) -->
+    <div id="scrollDownIndicator" class="scroll-down-indicator hide-indicator" style="bottom: 100px;">
+        <svg viewBox="0 0 24 24">
+            <path d="M12 16.5c-.3 0-.5-.1-.7-.3l-6-6a1 1 0 0 1 1.4-1.4L12 14.1l5.3-5.3a1 1 0 0 1 1.4 1.4l-6 6c-.2.2-.4.3-.7.3z"/>
+        </svg>
+    </div>
+
+    <!-- Estetik Scroll Up Indicator (SVG) -->
+    <div id="scrollUpIndicator" class="scroll-down-indicator hide-indicator" style="bottom: 100px;">
+        <svg viewBox="0 0 24 24">
+            <path d="M12 7.5c.3 0 .5.1.7.3l6 6a1 1 0 0 1-1.4 1.4L12 9.9l-5.3 5.3a1 1 0 0 1-1.4-1.4l6-6c.2-.2.4-.3.7-.3z"/>
+        </svg>
+    </div>
+
+    <!-- Modal ŞABLONU -->
+    <div id="projectModal" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.8); overflow:auto;">
+        <div class="modal-content" style="background: #0f0f0f; color: white; margin: 5% auto; padding: 25px 30px; border-radius: 16px; width: 90%; max-width: 800px; font-family: 'Segoe UI', sans-serif; position:relative; box-shadow: 0 0 25px rgba(0,0,0,0.9);">
+            <span id="modalClose" style="position: absolute; top: 16px; right: 24px; font-size: 30px; cursor: pointer;">&times;</span>
+            <div id="modalContent">
+                <!-- JavaScript burayı dolduracak -->
+            </div>
+        </div>
+    </div>
+    <script>
+        const modalData = {
+            "tez": `
+            <a href="{% url 'tez_en' %}" class="project-button" 
+            style="background-color: #ffdc34; color: black; font-weight: bold; font-size: 1.2em; padding: 10px 20px; border-radius: 10px; display: inline-block; margin-bottom: 20px; text-decoration: none;">
+                    THE PROBLEM OF IMPROVING ACCESSIBILITY AND PLACEMENT OF SMART DELIVERY LOCKERS IN ESKIŞEHIR TEPEBAŞI DISTRICT
+            </a>    
+                    </div>
+                <p style="line-height: 1.6;">
+                    This is a group project carried out as part of the Bachelor's Graduation Project. The aim is to present a <strong>comprehensive decision support system</strong> that aims to determine the most suitable locations for smart delivery lockers <strong>among 21 urban neighborhoods in the Eskişehir/Tepebaşı district</strong> using the Set Covering Problem and the TOPSIS method.
+
+                    The solution process includes prioritizing neighborhoods based on their demographic characteristics using the TOPSIS method, calculating distances between neighborhoods to create a coverage matrix, and using the Set Covering optimization model to <strong>maximize coverage with the minimum number of lockers</strong> and to <strong>prioritize the selected centers</strong>.
+
+                    Through a <strong>visual and interactive HTML interface</strong>, users can select a coverage radius, and based on this selection, the <strong>system automatically performs the optimization</strong>. The <strong>Google Street View images of the selected centers are provided just one click away</strong>, ensuring a user-friendly and practical structure.
+                </p>
+
+                <div style="background-color: #2c2c2c; padding: 12px 18px; border-radius: 10px; margin-top: 20px; font-weight: bold;">
+                    My individual roles in this project included drawing neighborhood boundaries and converting geographic coordinates into a format processable by the model using ScribbleMaps and QGIS, creating visuals for the interface and the project fair poster using Adobe Photoshop, performing data analysis, developing the optimization model and coding structure using Python, and developing a Decision Support System with an HTML-based interface.
+                </div>
+
+                <!-- Görseller -->
+                <div style="margin-top: 20px;">
+                    <img src="{% static 'documents/tez-poster.jpeg' %}" alt="Tez Poster"
+                        style="width: 100%; height: auto; max-height: 650px; object-fit: contain; border-radius: 10px; margin-bottom: 12px;">
+                    <img src="{% static 'documents/tez-1.jpeg' %}" alt="Tez Görseli 1"
+                        style="width: 100%; height: auto; max-height: 500px; object-fit: contain; border-radius: 10px;">
+                </div>
+
+                <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                    <strong>Original Language:</strong>
+                    <img src="{% static 'tr.png' %}" alt="Türkçe" style="height: 1.5em; vertical-align: middle;">
+                </div>
+            `,
+        "staj": `
+            <style>
+                /* Modal açıldığında sadece video oynat butonunu gizle */
+                .video-container #playButton {
+                    display: none !important;
+                }
+            </style>
+
+            <a href="{% url 'staj_en' %}" class="project-button" 
+            style="background-color: #ffdc34; color: black; font-weight: bold; font-size: 1.2em; padding: 10px 20px; border-radius: 10px; display: inline-block; margin-bottom: 20px; text-decoration: none;">
+                EnerjiSA - SPARK'24: PRINCIPLES OF PARALLEL OPERATION OF POWER TRANSFORMERS IN DISTRIBUTION NETWORKS
+            </a>
+
+            <p style="line-height: 1.6;">
+                Between the dates of 02.07.2024 - 30.07.2024, within the scope of my Mandatory Management Internship at EnerjiSA - Toroslar EDAŞ, this includes the <strong>parts I was responsible for and the work I carried out</strong> during the project we conducted together with my group members and our group coach Ahmet CANBOLAT. The objective was to determine whether <strong>temperature and humidity levels have an effect on the observed peak values of 14 step-down substations</strong> located in the Mersin Metropolitan Area in line with the <strong>principles of parallel connection of power transformers in distribution networks</strong>, and to provide prediction opportunities and analyze the results. In this context, data on <strong>daily peak values and transformer capacities, daily average temperature values, and daily average humidity rates</strong> between 01.01.2023 and 30.06.2024 were used.
+                In this context, data covering <strong>daily peak values and transformer capacities, daily average temperature values, and daily average humidity rates between 01.01.2023 and 30.06.2024</strong> were used.
+            </p>
+
+            <div style="background-color: #2c2c2c; padding: 12px 18px; border-radius: 10px; margin-top: 20px; font-weight: bold;">
+                My individual roles in this project included retrieving the data and preparing it for processing, performing regression analyses in Python to examine the effects of temperature and humidity levels on peak values, deriving regression equations for each transformer, and developing a Parameter-Based Power Predictor using these equations. Additionally, energy efficiency calculations were carried out based on the prediction results, critical transformers were identified through Pareto analysis according to the criteria of average active power and average occupancy rate, and the entire process was visually presented along with the preparation of a project introduction video.            </div>
+
+            <!-- Görseller -->
+            <div style="margin-top: 20px;">
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <img src="{% static 'documents/spark-sunumgrup.jpeg' %}" alt="Sunum Grubu" style="width: 50%; border-radius: 10px;">
+                    <img src="{% static 'documents/spark-r-p.jpeg' %}" alt="Regresyon Puan" style="width: 50%; border-radius: 10px;">
+                </div>
+
+                <!-- Video Container -->
+                <div class="video-container" style="position: relative; max-width: 100%; border-radius: 10px; overflow: hidden; margin-bottom: 15px;">
+                    <video id="customVideo" preload="metadata" controls style="width: 100%; border-radius: 10px;">
+                        <source src="{% static 'documents/spark-anim.mp4' %}" type="video/mp4">
+                        Tarayıcınız video etiketini desteklemiyor.
+                    </video>
+                    <div id="playButton" class="play-button" title="Oynat" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                        display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; background-color: rgba(0,0,0,0.5); border-radius: 50%; cursor: pointer;">
+                        <svg viewBox="0 0 24 24" fill="white" width="36" height="36">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <img src="{% static 'documents/spark-rs.jpeg' %}" alt="Regresyon Sıcaklık" 
+                    style="width: 100%; height: 560px; border-radius: 15px; object-fit: fill;">
+            </div>
+
+            <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                <strong>Original Language:</strong>
+                <img src="{% static 'tr.png' %}" alt="Türkçe" style="height: 1.5em; vertical-align: middle;">
+            </div>
+        `,
+            "vb": `
+                <a href="{% url 'veri_en' %}" class="project-button" 
+                style="background-color: #ffdc34; color: black; font-weight: bold; font-size: 1.2em; padding: 10px 20px; border-radius: 10px; display: inline-block; margin-bottom: 20px;">
+                    ENM421 - Introduction to Data Science: HEART DISEASE DETECTION
+                </a>      
+                <p style="line-height: 1.6;">
+                    This study was carried out as part of the ENM421 - Introduction to Data Science course. In the project, heart disease data was analyzed through the steps of <strong>missing value handling, standardization of variables</strong>, and <strong>visualization</strong>. Then, the data was split into <strong>training</strong> and <strong>test</strong> sets, and a <strong>classification model was developed using the Random Forest algorithm</strong>.
+
+                    The model’s performance was evaluated using metrics such as the <strong>confusion matrix, accuracy, precision, recall</strong>, and <strong>F1 score</strong>. Additionally, <strong>the importance of each variable in the model was analyzed</strong>, and the results were saved in a JSON file.
+
+                    With this project, <strong>a successful model for predicting heart disease using data science techniques was developed</strong>.
+                </p>
+                <div style="background-color: #2c2c2c; padding: 12px 18px; border-radius: 10px; margin-top: 20px; font-weight: bold;">
+                    As this project was conducted individually, all files and work are solely my own.
+                </div>
+                <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                    <strong>Original Language:</strong>
+                    <img src="{% static 'tr.png' %}" alt="Türkçe" style="height: 1.5em; vertical-align: middle;">
+                </div>
+            `,
+            "sasa1": `
+                <a href="{% url 'sasamakro_en' %}" class="project-button" 
+                style="background-color: #ffdc34; color: black; font-weight: bold; font-size: 1.2em; padding: 10px 20px; border-radius: 10px; display: inline-block; margin-bottom: 20px;">
+                    SASA POLYESTER INC. – IMPROVEMENT STUDIES ON THE FIBER PRODUCTION PLANNING PROCESS USING EXCEL VBA & MACRO
+                </a> 
+                <p style="line-height: 1.6;">
+                    Within the scope of my <strong>Mandatory Production Internship</strong> carried out at <strong>SASA Polyester Inc.</strong> between <strong>01.07.2025 – 30.07.2025</strong>, the <strong>Excel VBA codes and Macro assignments</strong> I developed were designed to automatically manage, update, and organize daily production plans and <strong>data downloaded from SAP</strong> in Excel files.
+                    These codes automate tasks such as automatically highlighting the current date, filtering up-to-date data from stock, shipment, and balance files downloaded from the SAP system and transferring them to the relevant sheets, ensuring data integrity, verifying product codes, and alerting for missing entries — thereby eliminating <strong>manual operations</strong>.
+                    This work was prepared as part of the <strong>process improvement studies</strong> I carried out during my internship at <strong>SASA Polyester</strong>, aiming to accelerate processes, reduce error rates, and increase data accuracy.            </p>
+                </p>
+                <div style="background-color: #2c2c2c; padding: 12px 18px; border-radius: 10px; margin-top: 20px; font-weight: bold;">
+                    As this project was conducted individually, all files and work are solely my own.
+                </div>
+                <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                    <strong>Orijinal Dil:</strong>
+                    <img src="{% static 'tr.png' %}" alt="Türkçe" style="height: 1.5em; vertical-align: middle;">
+                </div>
+            `,
+
+            "network": `
+                <a href="{% url 'network_en' %}" class="project-button" 
+                style="background-color: #ffdc34; color: black; font-weight: bold; font-size: 1.2em; padding: 10px 20px; border-radius: 10px; display: inline-block; margin-bottom: 20px;">
+                    ENM326 - Network Optimization and Algorithms: NURSE STAFF SCHEDULING 
+                </a>      
+                <p style="line-height: 1.6;">
+                    This study was carried out as part of the ENM326 - Network Optimization and Algorithms course. In the project, a <strong>maximum flow optimization model</strong> was developed by considering <strong>nurse requirements for different shifts</strong> and <strong>departments</strong>, as well as <strong>capacity limits</strong> and <strong>demands</strong>.
+
+                    In the model, <strong>flow variables</strong> between <strong>shifts</strong> and <strong>departments</strong> were defined, <strong>upper and lower bounds</strong> and <strong>demand constraints</strong> were introduced, and an <strong>objective function was formulated to minimize the total number of nurses</strong>.
+
+                    The model was solved using <strong>Gurobi</strong>, the obtained <strong>optimal flow values were interpreted</strong>, and the <strong>results were visualized in layers through a detailed network graph</strong>.
+
+                    Thus, <strong>the allocation of nurses to shifts and departments was optimized, enabling efficient use of resources</strong>.
+                </p>
+                <div style="background-color: #2c2c2c; padding: 12px 18px; border-radius: 10px; margin-top: 20px; font-weight: bold;">
+                    In this project, I was responsible for carrying out the coding process, preparing the report, and creating the presentation. I also undertook the tasks of conducting network simulations and performing performance analyses.
+                </div>
+                <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                    <strong>Original Language:</strong>
+                    <img src="{% static 'en.png' %}" alt="Türkçe" style="height: 1.5em; vertical-align: middle;">
+                </div>
+            `,
+
+            "pp": `
+                <a href="{% url 'project_planning_en' %}" class="project-button" 
+                style="background-color: #ffdc34; color: black; font-weight: bold; font-size: 1.2em; padding: 10px 20px; border-radius: 10px; display: inline-block; margin-bottom: 20px;">
+                    ENM448 - Project Planning and Management: FILM GALA PLANNING
+                </a>      
+                <p style="line-height: 1.6;">
+                    Within the scope of the ENM448 - Project Planning and Management course, a <strong>sample project management plan</strong> based on a film premiere event was designed. In this context, the core phases of project management—<strong>planning, organization</strong>, and <strong>execution</strong>—were analyzed in detail. A comprehensive <strong>project plan</strong> was developed by focusing on elements such as <strong>venue selection, security measures, media and promotional activities, technical infrastructure requirements, logistics services</strong>, and <strong>guest management</strong>. Additionally, project management tools such as a <strong>timeline, task distribution</strong>, and <strong>critical path analysis</strong> were utilized to evaluate the project's feasibility. This process <strong>contributed to the development of my theoretical knowledge and skills in project management</strong>.
+                </p>
+                <div style="background-color: #2c2c2c; padding: 12px 18px; border-radius: 10px; margin-top: 20px; font-weight: bold;">
+                    In this project, I took on the roles of preparing the presentation, Project Manager, Logistics Manager, and Media & Communication Manager.
+                </div>
+                <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                    <strong>Original Language:</strong>
+                    <img src="{% static 'en.png' %}" alt="Türkçe" style="height: 1.5em; vertical-align: middle;">
+                </div>
+            `,
+            "regresyon": `
+                <a href="{% url 'reg_en' %}" class="project-button" 
+                style="background-color: #ffdc34; color: black; font-weight: bold; font-size: 1.2em; padding: 10px 20px; border-radius: 10px; display: inline-block; margin-bottom: 20px;">
+                    ENM310 - Design of Experiments and Regression Analysis: TEA - TEMPERATURE - TIME
+                </a>
+                
+                <p style="line-height: 1.6;">
+                    Within the scope of the ENM310 - Design of Experiments and Regression Analysis course, a project was conducted to examine <strong>the effects of brewing tea under different conditions on taste</strong>. Three different factors—<strong>type of tea, water temperature</strong>, and <strong>brewing time</strong>—and their effects at two levels were analyzed. The <strong>taste score</strong> was considered as the output variable, and evaluations were made using statistical methods such as <strong>analysis of variance (ANOVA), interaction plots</strong>, and the <strong>Tukey test</strong>. According to the findings, <strong>all three factors had statistically significant effects on the taste of the tea; however, the interactions between these factors were found to be insignificant</strong>. Through this project, <strong>I had the opportunity to enhance my theoretical knowledge and analytical skills in experimental design and multi-factor data analysis</strong>. 
+                <div style="background-color: #2c2c2c; padding: 12px 18px; border-radius: 10px; margin-top: 20px; font-weight: bold;">
+                    In this project, my roles included preparing the presentation, performing the necessary statistical method calculations, and interpreting the results.
+                </div>
+                <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                    <strong>Original Language:</strong>
+                    <img src="{% static 'tr.png' %}" alt="Türkçe" style="height: 1.5em; vertical-align: middle;">
+                </div>
+            `
+            // Diğer projeler için buraya eklemeler yapılabilir.
+        };
+    </script>
+
+    <!-- Modal Davranışı -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const modal = document.getElementById("projectModal");
+            const modalContent = document.getElementById("modalContent");
+            const modalClose = document.getElementById("modalClose");
+
+            document.querySelectorAll(".project-box[data-project-id]").forEach(box => {
+                box.addEventListener("click", () => {
+                    const id = box.getAttribute("data-project-id");
+                    modalContent.innerHTML = modalData[id] || "<p>İçerik bulunamadı.</p>";
+                    modal.style.display = "block";
+                });
+            });
+
+            modalClose.addEventListener("click", () => {
+                modal.style.display = "none";
+            });
+
+            window.addEventListener("click", (event) => {
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+        });
+    </script>
+        <!-- MyWebsite Modal-2 -->
+        <div id="website-modal-2" class="modal-2-overlay">
+            <div class="modal-2-content">
+                <span class="modal-2-close" id="website-modal-2-close">&times;</span>
+                <img src="{% static 'erhan-1.jpeg' %}" alt="Erhan" class="center-image-modal-2">
+                <h2>It would be a great honor for me to have an inspiring conversation with you about this website and to add new colors to my project through your valuable insights &#128522;</h2>
+                <p>
+                    <!-- Envelope icon -->
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M2 4h20v16H2z" fill="none"/>
+                        <path d="M22 6l-10 7L2 6V6h20zM2 18V8l10 7 10-7v10H2z"/>
+                    </svg>
+                    <a href="mailto:erhan.simseker33@gmail.com">erhan.simseker33@gmail.com</a>
+                </p>
+                <p>
+                    <!-- Phone icon -->
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M6.62 10.79a15.091 15.091 0 006.59 6.59l2.2-2.2a1 1 0 01.94-.27c1.12.27 2.33.42 3.57.42a1 1 0 011 1v3.5a1 1 0 01-1 1C10.07 21.5 2.5 13.93 2.5 4.5a1 1 0 011-1H7a1 1 0 011 1c0 1.24.15 2.45.42 3.57a1 1 0 01-.27.94l-2.2 2.2z"/>
+                    </svg>
+                    <a href="tel:+905518293149">+90 551 829 31 49</a>
+                </p>
+                <p>
+                    <!-- LinkedIn icon -->
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M4.98 3.5C3.34 3.5 2 4.84 2 6.48s1.34 2.98 2.98 2.98 2.98-1.34 2.98-2.98S6.62 3.5 4.98 3.5zM2.4 21.5h5.16V9H2.4v12.5zM9.84 9h4.95v1.71h.07c.69-1.3 2.37-2.67 4.88-2.67 5.22 0 6.18 3.43 6.18 7.89V21.5h-5.16v-6.99c0-1.67-.03-3.83-2.33-3.83-2.33 0-2.68 1.82-2.68 3.71V21.5H9.84V9z"/>
+                    </svg>
+                    <a href="https://www.linkedin.com/in/erhansimseker" target="_blank" rel="noopener noreferrer">
+                        www.linkedin.com/in/erhansimseker
+                    </a>
+                </p>
+            </div>
+        </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const triggers = document.querySelectorAll('[data-open="website-modal-2"]');
+        const modal = document.getElementById('website-modal-2');
+        const closeBtn = modal.querySelector('.modal-2-close');
+
+        function openModal() {
+            modal.classList.add('active');
+            modal.setAttribute('aria-hidden', 'false');
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+
+        // Tıklama ile açma
+        triggers.forEach(trigger => {
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                openModal();
+            });
+        });
+
+        // Kapatma butonu
+        closeBtn.addEventListener('click', closeModal);
+
+        // Overlay'e tıklayınca kapatma
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // ESC ile kapatma
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+    });
+    </script>
+
+
+</body>
+</html>

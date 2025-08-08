@@ -1,0 +1,396 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>About Me in Brief</title>
+    <style>
+        /* Import modern font for modal */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+
+        .language-buttons {
+            position: fixed;
+            top: 16px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            gap: 12px;
+        }
+
+        .language-buttons img {
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .language-buttons img:hover {
+            transform: scale(1.1);
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url("{% static 'wallpaper-2.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            max-width: 1400px;
+            margin-top: 40px;
+            padding: 0 20px;
+        }
+
+        .box {
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 30px;
+            border-radius: 12px;
+            box-sizing: border-box;
+            opacity: 0;
+            transform: translateX(-100%);
+            animation: slideIn 0.5s ease-out forwards;
+        }
+
+        .box:nth-child(1) { animation-delay: 0.1s; }
+        .box:nth-child(2) { animation-delay: 0.2s; }
+        .box:nth-child(3) { animation-delay: 0.3s; }
+        .box:nth-child(4) { animation-delay: 0.4s; }
+
+        .box > h1 { text-align: center; }
+        .box h2,
+        .box p,
+        .box li {
+            opacity: 0;
+            transform: translateX(-100%);
+            animation: slideIn 0.5s ease-out forwards;
+        }
+
+        .box h1 { animation-delay: 0.15s; }
+        .box h2 { animation-delay: 0.2s; }
+        .box p,
+        .box li { animation-delay: 0.25s; }
+
+        ul {
+            padding-left: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+            list-style-position: inside;
+        }
+
+        .skills-flex {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .skills-flex > div {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .button-wrapper {
+            margin: 45px 0 25px;
+            opacity: 0;
+            transform: translateX(-100%);
+            animation: slideIn 0.5s ease-out forwards;
+            animation-delay: 0.5s;
+        }
+
+        .back-button {
+            background-color: white;
+            color: black;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .back-button:hover {
+            background-color: black;
+            color: white;
+        }
+
+        .center-image-wrapper {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+            animation-delay: 0.4s;
+        }
+
+        .center-image {
+            width: 200px;
+            height: 230px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
+            background-color: rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        @keyframes slideIn {
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 1000px) {
+            .content-grid { grid-template-columns: 1fr; }
+            .skills-flex { flex-direction: column; }
+        }
+
+        /* Icon styling */
+        .icon {
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+            margin-right: 8px;
+            fill: currentColor;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 10, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            padding: 20px;
+            overflow-y: auto;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            color: white;
+            position: relative;
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #ccc;
+            transition: color 0.2s ease;
+        }
+
+        .modal-close:hover {
+            color: #ff6b6b;
+        }
+
+        .center-image-modal {
+            width: 180px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            margin: 0 auto 20px;
+            display: block;
+        }
+
+        .modal-content h2 {
+            margin: 16px 0;
+            font-size: 26px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-content p {
+            font-size: 16px;
+            line-height: 1.5;
+            margin: 12px 0;
+            font-weight: 300;
+        }
+
+        .modal-content a {
+            color: #0e76a8;
+            text-decoration: none;
+        }
+
+        .modal-content a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="language-buttons">
+        <a href="{% url 'hakkimda' %}">
+            <img src="{% static 'tr.png' %}" alt="Türkçe">
+        </a>
+        <a href="{% url 'about_me' %}">
+            <img src="{% static 'en.png' %}" alt="English">
+        </a>
+    </div>
+    <div class="content-grid">
+        <!-- About Me in Brief -->
+        <div class="box">
+            <h1>About Me in Brief</h1>
+            <p>
+                I was born on September 30, 2001, in Mersin. After graduating from <strong>Yahya Akel Science High School</strong> in June 2019, I ranked <strong>56,996th in the quantitative section</strong> of the national exam and received a <strong>full scholarship</strong> to pursue Electrical and Electronics Engineering at Istanbul Aydın University. I completed the foundation year and freshman year by June 2021. Realizing my affinity for Industrial Engineering, I transferred to <strong>Eskişehir Technical University</strong> in September 2021 and graduated in June 2025.
+            </p>
+        </div>
+        <!-- What Shapes Me -->
+        <div class="box">
+            <h1>What Shapes Me</h1>
+            <ul>
+                <li>Analytical and Practical Thinker</li>
+                <li>Team Player</li>
+                <li>Quick Adapter</li>
+                <li>Efficiency-Driven</li>
+                <li>Customer Relations Experience</li>
+                <li>Fluent in Turkish and English</li>
+                <li>Growth-Minded Attitude</li>
+                <li>Solid Academic Foundations</li>
+                <li>Competence Over Salary Expectations</li>
+            </ul>
+        </div>
+        <!-- My Skills -->
+        <div class="box">
+            <h1>My Skills</h1>
+            <div class="skills-flex">
+                <div>
+                    <h2>Professional Skills</h2>
+                    <ul>
+                        <li>C1-Level English</li>
+                        <li>Advanced Python</li>
+                        <li>Advanced HTML</li>
+                        <li>Advanced Excel, Word, PowerPoint</li>
+                        <li>Advanced GAMS</li>
+                        <li>Advanced Excel VBA & Macros</li>
+                        <li>Expert Arena Simulation</li>
+                    </ul>
+                </div>
+                <div>
+                    <h2>Personal Skills</h2>
+                    <ul>
+                        <li>Proficient FL Studio</li>
+                        <li>Expert Adobe Audition Pro</li>
+                        <li>Expert Adobe Photoshop</li>
+                        <li>Expert Adobe Premiere Pro</li>
+                        <li>Competent QGIS</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- My Hobbies -->
+        <div class="box">
+            <h1>My Hobbies</h1>
+            <ul>
+                <li>Creating Electronic Music</li>
+                <li>Watching Series & Movies</li>
+                <li>Sports (Basketball, Football, Fitness)</li>
+                <li>Chess</li>
+                <li>Software & Web Design</li>
+                <li>Reading Books</li>
+                <li>Cooking</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="button-wrapper">
+        <a href="{% url 'hello' %}" class="back-button">Back to Homepage</a>
+    </div>
+
+    <div class="center-image-wrapper">
+        <img src="{% static 'erhan-1.jpeg' %}" alt="Erhan" class="center-image">
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="modal" class="modal-overlay">
+        <div class="modal-content">
+            <span id="modal-close" class="modal-close">&times;</span>
+            <img src="{% static 'erhan-1.jpeg' %}" alt="Erhan" class="center-image-modal">
+            <h2>My Personal Information</h2>
+            <p>
+                <!-- Envelope icon -->
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M2 4h20v16H2z" fill="none"/>
+                    <path d="M22 6l-10 7L2 6V6h20zM2 18V8l10 7 10-7v10H2z"/>
+                </svg>
+                <a href="mailto:erhan.simseker33@gmail.com">erhan.simseker33@gmail.com</a>
+            </p>
+            <p>
+                <!-- Phone icon -->
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M6.62 10.79a15.091 15.091 0 006.59 6.59l2.2-2.2a1 1 0 01.94-.27c1.12.27 2.33.42 3.57.42a1 1 0 011 1v3.5a1 1 0 01-1 1C10.07 21.5 2.5 13.93 2.5 4.5a1 1 0 011-1H7a1 1 0 011 1c0 1.24.15 2.45.42 3.57a1 1 0 01-.27.94l-2.2 2.2z"/>
+                </svg>
+                <a href="tel:+905518293149">+90 551 829 31 49</a>
+            </p>
+            <p>
+                <!-- LinkedIn icon -->
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M4.98 3.5C3.34 3.5 2 4.84 2 6.48s1.34 2.98 2.98 2.98 2.98-1.34 2.98-2.98S6.62 3.5 4.98 3.5zM2.4 21.5h5.16V9H2.4v12.5zM9.84 9h4.95v1.71h.07c.69-1.3 2.37-2.67 4.88-2.67 5.22 0 6.18 3.43 6.18 7.89V21.5h-5.16v-6.99c0-1.67.03-3.83-2.33-3.83-2.33 0-2.68 1.82-2.68 3.71V21.5H9.84V9z"/>
+                </svg>
+                <a href="https://www.linkedin.com/in/erhansimseker" target="_blank" rel="noopener noreferrer">www.linkedin.com/in/erhansimseker</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const img = document.querySelector('.center-image');
+            const modal = document.getElementById('modal');
+            const closeBtn = document.getElementById('modal-close');
+
+            img.addEventListener('click', () => modal.classList.add('active'));
+            closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+            modal.addEventListener('click', e => {
+                if (e.target === modal) modal.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>

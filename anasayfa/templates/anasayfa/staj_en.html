@@ -1,0 +1,148 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>PARAMETER-BASED POWER PREDICTOR</title>
+    <style>
+        .language-buttons {
+            position: fixed;
+            top: 16px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            gap: 12px;
+        }
+
+        .language-buttons img {
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .language-buttons img:hover {
+            transform: scale(1.1);
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url("{% static 'wallpaper-2.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            margin-top: 40px;
+            padding: 30px 50px;
+            border-radius: 14px;
+            width: 95%;
+            max-width: 1200px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 32px;
+            color: #ffeb99;
+        }
+
+        /* Video kapsayıcısı: responsive embed ve ön izleme */
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 oranı */
+            margin-bottom: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #000; /* İframe yüklenirken siyah arka plan */
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .wide-video-button {
+            background-color: #fff799;
+            color: #333;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .wide-video-button:hover { background-color: #fff566; }
+
+        .presentation-button {
+            background-color: #ffd1a6;
+            color: #4d2600;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .presentation-button:hover { background-color: #ffba75; }
+
+        .back-button {
+            background-color: white;
+            color: black;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: 0.3s ease;
+        }
+        .back-button:hover {
+            background-color: black;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="language-buttons">
+        <a href="{% url 'proje_staj' %}">
+            <img src="{% static 'tr.png' %}" alt="Türkçe">
+        </a>
+        <a href="{% url 'staj_en' %}">
+            <img src="{% static 'en.png' %}" alt="English">
+        </a>
+    </div>
+    <div class="container">
+        <h1>PARAMETER-BASED POWER PREDICTOR (TURKISH)</h1>
+
+        <div class="video-container">
+            <iframe
+                src="https://www.youtube.com/embed/k3DyaJzLEEI?si=dw-O_c9YeuodY0oh"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+            </iframe>
+        </div>
+
+        <div class="button-group">
+            <a href="{% url 'tedas_ext' %}" class="wide-video-button">Extended Video (Turkish)</a>
+            <a href="{% url 'tedas_pre' %}" class="presentation-button">Presentation (English)</a>
+            <a href="{% url 'projects' %}" class="back-button">Back to Previous Page</a>
+            <a href="{% url 'hello' %}" class="back-button">Back to Homepage</a>
+        </div>
+    </div>
+
+</body>
+</html>

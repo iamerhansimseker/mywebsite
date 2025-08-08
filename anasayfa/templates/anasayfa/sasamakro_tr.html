@@ -1,0 +1,1116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>sasamakro</title>
+    <style>
+        .language-buttons {
+            position: fixed;
+            top: 16px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            gap: 12px;
+        }
+
+        .language-buttons img {
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .language-buttons img:hover {
+            transform: scale(1.1);
+        }
+        /* İNDİRME BLOĞU — sayfa akışında, ortalı */
+        .center-download{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        margin: 24px 0; /* ikonlar ile nav arasında boşluk */
+        }
+
+        .center-download .dl-img{
+        height: 56px;
+        width: auto;
+        opacity: .95;
+        cursor: pointer;
+        }
+
+        .center-download .dl-text{
+        font-size: 15px;
+        font-weight: 600;
+        color: white;
+        user-select: none;
+        pointer-events: none; /* metin tıklanmasın */
+        }
+
+        @media (max-width:480px){
+        .center-download .dl-img{ height:44px; }
+        .center-download .dl-text{ font-size:14px; }
+        }
+
+
+        @media (max-width: 480px){
+        .fixed-download { top: 72px; }
+        .fixed-download .dl-img { height: 44px; }
+        .fixed-download .dl-text { font-size: 14px; }
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url("{% static 'wallpaper-2.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Excel ikonları ve başlıklar */
+        .icons-row {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        .icon-item { 
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 240px;          /* ikon genişliği kadar kutu */
+        }
+
+        .icon-item img {
+        width: 240px;
+        height: 240px;
+        display: block;
+        cursor: pointer;        /* satır içi boşlukları kaldırır */
+        }
+        .icon-item img:hover { transform: scale(1.15); }
+        .icon-title {
+        width: 100%;
+        text-align: center;    /* yazıyı kutu içinde ortala */
+        }
+        .highlight-box {
+            background-color: #f1c40f;
+            color: black;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-weight: bold;
+            display: inline-block;
+            width: fit-content;
+            max-width: 100%;
+            white-space: nowrap;
+        }
+
+        /* Butonlar */
+        .button-group { display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; }
+        .back-button {
+            background-color: white; color: black; padding: 12px 24px; font-size: 16px;
+            border-radius: 10px; font-weight: bold; text-decoration: none; transition: 0.3s ease;
+        }
+        .back-button:hover { background-color: black; color: white; }
+
+        /* Modal genel */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(10, 10, 10, 0.85);
+            display: none; justify-content: center; align-items: center;
+            z-index: 9999; padding: 20px; overflow-y: auto;
+        }
+        .modal-overlay.active { display: flex; }
+
+        /* İKİLİ düzen: sağda yan panel */
+        .modal-content-wrapper {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: stretch;
+            width: 100%;
+            /* geniş ekranda yan yana kalması için sarmalayıcıyı kısıtlamıyoruz */
+        }
+
+        /* Kutu ortak stil */
+        .modal-content-box {
+            background: rgba(0,0,0,0.85);
+            padding: 28px;
+            border-radius: 12px;
+            max-height: 95vh;
+            overflow-y: auto;
+            color: #fff;
+            box-shadow: 0 0 25px rgba(0,0,0,0.9);
+            position: relative;
+        }
+
+        /* Soldaki ana kutu ve sağdaki yan kutu boyutları */
+        #mainBox,
+        #sideBox {
+            flex: 0 1 720px; /* aynı genişlikte olsun */
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        /* Tek kutu modunda (diğer makrolar) ana kutu geniş */
+        .single { flex: 0 1 900px !important; }
+
+        .modal-close {
+            position: absolute; top: 10px; right: 16px;
+            font-size: 30px; line-height: 1; cursor: pointer;
+        }
+        .modal-title { font-size: 22px; margin: 0 0 14px 0; color: #ffdc34; font-weight: 700; text-align: center; }
+        .modal-body { line-height: 1.6; }
+        .modal-body img { width: 100%; height: auto; border-radius: 10px; margin-top: 12px; }
+
+        /* Kod stili */
+        .code-block{
+            background:#0b0b0b; color:#eaeaea;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+            font-size:14px; line-height:1.55; padding:16px 18px;
+            border-radius:10px; border:1px solid rgba(255,255,255,.08);
+            overflow:auto; max-height:70vh; white-space: pre;
+        }
+
+        /* Küçük ekran: alta insin (istenen davranış) */
+        @media (max-width: 1100px) {
+            .modal-content-wrapper { flex-wrap: wrap; }
+            #mainBox, #sideBox, .single { flex: 1 1 100% !important; }
+        }
+        /* Kutu içerikleri dikey flex olsun */
+        .modal-content-box{
+        display: flex;
+        flex-direction: column;
+        }
+
+        /* Sol kutuda: başlık sabit, gövde esnesin */
+        #mainBox .modal-title{
+        flex: 0 0 auto;
+        }
+        #mainBox .modal-body{
+        flex: 1 1 auto;      /* kalan yüksekliği kapla */
+        display: flex;       /* içinde code-block'u da esnetebilmek için */
+        min-height: 0;       /* overflow hatalarını önler */
+        }
+
+        /* Kod bloğu, gövdenin tamamını doldursun */
+        #mainBox .modal-body .code-block{
+        flex: 1 1 auto;
+        min-height: 0;
+        height: 100%;        /* başlık dışında kalan alanın tamamı */
+        max-height: none;    /* 70vh sınırını kaldır */
+        box-sizing: border-box;
+        overflow: auto;      /* içerik taşarsa içinden scroll */
+        }
+
+        /* Küçük ekranlarda da aynı mantık çalışsın */
+        @media (max-width: 1100px){
+        #mainBox .modal-body{ min-height: 0; }
+        #mainBox .modal-body .code-block{ height: 100%; }
+}
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 32px;
+            color: #ffeb99;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="language-buttons">
+        <a href="{% url 'proje_sasamakro' %}">
+            <img src="{% static 'tr.png' %}" alt="Türkçe">
+        </a>
+        <a href="{% url 'sasamakro_en' %}">
+            <img src="{% static 'en.png' %}" alt="English">
+        </a>
+    </div>
+    <h1>SASA POLYESTER A.Ş. - EXCEL VBA & MAKRO İLE ELYAF ÜRETİM PLANLAMASI SÜRECİNE YÖNELİK İYİLEŞTİRME ÇALIŞMALARI</h1>
+    <!-- Excel ikonları -->
+    <div class="icons-row">
+        <div class="icon-item">
+            <img src="{% static 'excel.png' %}" alt="Excel 1" data-modal="excel1">
+            <div class="icon-title highlight-box">Makro 1</div>
+        </div>
+        <div class="icon-item">
+            <img src="{% static 'excel.png' %}" alt="Excel 2" data-modal="excel2">
+            <div class="icon-title highlight-box">Makro 2</div>
+        </div>
+        <div class="icon-item">
+            <img src="{% static 'excel.png' %}" alt="Excel 3" data-modal="excel3">
+            <div class="icon-title highlight-box">Makro 3</div>
+        </div>
+        <div class="icon-item">
+            <img src="{% static 'excel.png' %}" alt="Excel 4" data-modal="excel4">
+            <div class="icon-title highlight-box">Makro 4</div>
+        </div>
+        <div class="icon-item">
+            <img src="{% static 'excel.png' %}" alt="Excel 5" data-modal="excel5">
+            <div class="icon-title highlight-box">Makro 5</div>
+        </div>
+        <div class="icon-item">
+            <img src="{% static 'excel.png' %}" alt="Excel 6" data-modal="excel6">
+            <div class="icon-title highlight-box">Makro 6</div>
+        </div>
+    </div>
+    <!-- İNDİRME BLOĞU (YENİ KONUM) -->
+    <div class="center-download">
+    <a href="{% static 'documents/elyaf-planlama-calisma-dosyasi.xlsm' %}"
+        download="Elyaf Planlama Çalışma Dosyası.xlsm"
+        rel="noopener">
+        <img class="dl-img" src="{% static 'xlsm.png' %}" alt="Elyaf Planlama Çalışma Dosyası">
+    </a>
+    <div class="dl-text">Elyaf Planlama Çalışma Dosyasını İndir</div>
+    </div>
+    <!-- Navigasyon -->
+    <div class="button-group">
+        <a href="{% url 'projelerim' %}" class="back-button">Önceki Sayfaya Dön</a>
+        <a href="{% url 'merhaba' %}" class="back-button">Ana Sayfaya Dön</a>
+    </div>
+
+    <!-- Modal -->
+    <div id="excelModal" class="modal-overlay">
+        <div class="modal-content-wrapper">
+            <!-- Sol: Ana içerik -->
+        <div class="modal-content-box" id="mainBox">
+            <h3 class="modal-title" id="modalTitle"></h3>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+        <div class="modal-content-box" id="sideBox" style="display:none;">
+            <span class="modal-close">&times;</span> <!-- Çarpı buraya taşındı -->
+            <h3 class="modal-title" id="sideTitle">Ek Bilgiler</h3>
+            <div class="modal-body" id="sideBody"></div>
+        </div>
+
+
+    <script>
+        const excelModalData = {
+            excel1: {
+                title: "CizgiyiBugununTarihineCek()",
+                html: `<pre class="code-block"><code>Sub CizgiyiBugununTarihineCek()
+    Dim ws As Worksheet
+    Dim tarihSutunu As Range
+    Dim hucre As Range
+    Dim bugun As Date
+    Dim bulunanSatir As Long
+    Dim satirAraligi As Range
+    Dim h As Range
+    Application.ScreenUpdating = False
+    Application.Calculation = xlCalculationManual
+    Application.EnableEvents = False
+    bugun = Date
+    Set ws = ThisWorkbook.Sheets("Üretim Planları")
+    Set tarihSutunu = ws.Range("C2:C1000")
+    For Each hucre In tarihSutunu
+        If hucre.Value <> "" Then
+            Set satirAraligi = ws.Range("A" & hucre.Row & ":CC" & hucre.Row)
+            For Each h In satirAraligi
+                h.Borders(xlTop).LineStyle = xlNone
+                h.Borders(xlBottom).LineStyle = xlNone
+            Next h
+        End If
+    Next hucre
+    For Each hucre In tarihSutunu
+        If IsDate(hucre.Value) Then
+            If Int(hucre.Value) = Int(bugun) Then
+                bulunanSatir = hucre.Row
+                Set satirAraligi = ws.Range("A" & bulunanSatir & ":CC" & bulunanSatir)
+                For Each h In satirAraligi
+                    With h.Borders(xlBottom)
+                        .LineStyle = xlContinuous
+                        .Color = RGB(255, 0, 0)
+                        .Weight = xlThick
+                    End With
+                Next h
+                Exit For
+            End If
+        End If
+    Next hucre
+    Application.ScreenUpdating = True
+    Application.Calculation = xlCalculationAutomatic
+    Application.EnableEvents = True
+End Sub
+</code></pre>`,
+            sideHtml: `<p>Öncelikle bu makronun yaptıkları:</p>
+<ol>
+  <li><strong>Performansı artırmak için hazırlık yapar</strong>
+    <ul>
+      <li>Kod çalışırken ekran yenilenmesini, otomatik hesaplamaları ve makro tetikleyici olayları geçici olarak kapatır.</li>
+      <li>Böylece işlem çok daha hızlı ve sorunsuz tamamlanır.</li>
+    </ul>
+  </li>
+  <li><strong>Hangi sayfada ve hangi sütunda çalışacağını belirler</strong>
+    <ul>
+      <li>“Üretim Planları” sayfasında C sütununun (C2’den C1000’e kadar) tarih bilgilerini hedef alır.</li>
+    </ul>
+  </li>
+  <li><strong>Önceki kenarlıkları temizler</strong>
+    <ul>
+      <li>C sütunundaki her dolu hücre için, bulunduğu satırın A sütunundan CC sütununa kadar olan kısmındaki üst ve alt kenarlık çizgilerini tamamen siler.</li>
+      <li>Böylece eski çizgilerden kalan izler temizlenir.</li>
+    </ul>
+  </li>
+  <li><strong>Bugünün tarihini arar</strong>
+    <ul>
+      <li>C sütunundaki hücrelerdeki değerler tek tek incelenir.</li>
+      <li>Hücrede tarih varsa ve bu tarih bugünün tarihiyle aynıysa, o satır tespit edilir.</li>
+    </ul>
+  </li>
+  <li><strong>Bulunan satıra özel biçim uygular</strong>
+    <ul>
+      <li>Tespit edilen satırın A sütunundan CC sütununa kadar olan kısmının altına kalın ve kırmızı renkte bir çizgi ekler.</li>
+      <li>Böylece bugünün tarihi görsel olarak belirgin hâle gelir.</li>
+    </ul>
+  </li>
+  <li><strong>İşlemler tamamlandıktan sonra Excel ayarlarını eski hâline getirir</strong>
+    <ul>
+      <li>Ekran yenileme, otomatik hesaplama ve makro tetikleme ayarlarını tekrar açar.</li>
+      <li>Excel normal çalışma moduna döner.</li>
+    </ul>
+  </li>
+</ol>
+
+<p>Ve bu makronun sağladığı iyileştirmeler:</p>
+<ul>
+  <li><strong>Hızlı tespit:</strong> Bugünün tarihini anında bulur ve vurgular, manuel aramaya gerek kalmaz.</li>
+  <li><strong>Temiz görünüm:</strong> Önceki kenarlıkları temizlediği için sayfa daha düzenli ve okunabilir olur.</li>
+  <li><strong>Görsel netlik:</strong> Kalın kırmızı çizgi ile bugünün satırı hemen fark edilir.</li>
+  <li><strong>Hata riskini azaltma:</strong> Manuel işlem yapılmadığı için yanlış satırın işaretlenmesi riski ortadan kalkar.</li>
+  <li><strong>Tekrar kullanılabilirlik:</strong> Her gün yeniden çalıştırılabilir, güncel tarih satırını otomatik bulur.</li>
+  <li><strong>Performans optimizasyonu:</strong> Çalışma sırasında Excel’in ağır işlemlerini durdurarak makronun çok hızlı çalışmasını sağlar.</li>
+</ul>
+`},
+            excel2: {
+                title: `SAP_Stok_VeriCekme()   &#x279C;<img src="{% static 'makro-2.png' %}" alt="Makro 2" style="height:72px; vertical-align:middle; margin-left:8px;">`,
+                html: `<pre class="code-block"><code>Sub SAP_Stok_VeriCekme()
+    Application.ScreenUpdating = False
+    Application.Calculation = xlCalculationManual
+    Application.EnableEvents = False
+    Dim referansTarih As Date
+    referansTarih = DateSerial(2025, 7, 17) + TimeSerial(11, 3, 0)
+    Dim indirilenlerYolu As String
+    indirilenlerYolu = Environ("USERPROFILE") & "\Downloads\"
+    Dim fso As Object, klasor As Object, dosya As Object
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    Set klasor = fso.GetFolder(indirilenlerYolu)
+    Dim dosyaListesi As Collection: Set dosyaListesi = New Collection
+    Dim tempPath As String
+    Dim tempTarih As Date
+    For Each dosya In klasor.Files
+        If LCase(Right(dosya.Name, 5)) = ".xlsx" And InStr(LCase(dosya.Name), "stok") > 0 Then
+            If dosya.DateLastModified > referansTarih Then
+                dosyaListesi.Add dosya
+            End If
+        End If
+    Next
+    If dosyaListesi.Count = 0 Then
+        MsgBox "İndirilenlerde uygun Stok dosyası bulunamadı!", vbCritical
+        GoTo Temizlik
+    End If
+    Dim enSonDosya As String: enSonDosya = ""
+    Dim enSonTarih As Date: enSonTarih = 0
+    Dim enSonDosyaTarihi As Date
+    For Each dosya In dosyaListesi
+        If dosya.DateLastModified > enSonTarih Then
+            enSonTarih = dosya.DateLastModified
+            enSonDosya = dosya.Path
+            enSonDosyaTarihi = Int(dosya.DateLastModified)
+        End If
+    Next
+    Dim ayniGunDosyaSayisi As Integer: ayniGunDosyaSayisi = 0
+    For Each dosya In dosyaListesi
+        If Int(dosya.DateLastModified) = enSonDosyaTarihi Then
+            ayniGunDosyaSayisi = ayniGunDosyaSayisi + 1
+        End If
+    Next
+    Dim sapWB As Workbook: Set sapWB = Workbooks.Open(enSonDosya, ReadOnly:=True)
+    Dim sapWS As Worksheet: Set sapWS = sapWB.Sheets(1)
+    Dim veriBasSatir As Long: veriBasSatir = 3
+    Dim veriSonSatir As Long, veriSonSutun As Long
+    veriSonSatir = sapWS.Cells(sapWS.Rows.Count, 1).End(xlUp).Row
+    veriSonSutun = sapWS.Cells(veriBasSatir, sapWS.Columns.Count).End(xlToLeft).Column
+    If veriSonSatir < veriBasSatir Then
+        MsgBox "SAP dosyasında veri bulunamadı!", vbExclamation
+        sapWB.Close False
+        GoTo Temizlik
+    End If
+    Dim hedefWS As Worksheet
+    On Error Resume Next
+    Set hedefWS = ThisWorkbook.Sheets("Stok-scwm.mon")
+    On Error GoTo 0
+    If hedefWS Is Nothing Then
+        MsgBox "Hedef sayfa bulunamadı: Stok-scwm.mon", vbCritical
+        sapWB.Close False
+        GoTo Temizlik
+    End If
+    Dim sRow As Long, eRow As Long
+    sRow = 0; eRow = 0
+    Dim i As Long
+    For i = hedefWS.Cells(hedefWS.Rows.Count, 1).End(xlUp).Row To 2 Step -1
+        If InStr(1, hedefWS.Cells(i, 1).Text, "Güncelleme Tarihi: " & Format(enSonDosyaTarihi, "dd.mm.yyyy"), vbTextCompare) > 0 Then
+            sRow = i: Exit For
+        End If
+    Next i
+    If sRow > 0 Then
+        eRow = sRow
+        Do While hedefWS.Cells(eRow + 1, 1).Value <> "" And Left(hedefWS.Cells(eRow + 1, 1).Value, 18) <> "Güncelleme Tarihi"
+            eRow = eRow + 1
+        Loop
+        If sRow > 1 Then hedefWS.Rows(sRow & ":" & eRow).Delete
+    End If
+    hedefWS.Range("A1").Value = "Güncelleme Tarihi: " & Format(Now, "dd.mm.yyyy HH:nn:ss")
+    Dim yazilacakSatir As Long: yazilacakSatir = 3
+    If yazilacakSatir < 3 Then yazilacakSatir = 3
+    Dim iSat As Long, jSut As Long
+    For iSat = veriBasSatir To veriSonSatir
+        If WorksheetFunction.CountA(sapWS.Rows(iSat)) = 0 Then GoTo Atla
+        If Not IsEmpty(sapWS.Cells(iSat, 1).Value) Then
+            Dim ilkHuc As Variant: ilkHuc = sapWS.Cells(iSat, 1).Value
+            If VarType(ilkHuc) = vbString Then
+                If ilkHuc = "SBU" Or InStr(ilkHuc, "Firma") > 0 Or InStr(ilkHuc, "Tanım") > 0 Then GoTo Atla
+            End If
+        End If
+        For jSut = 1 To veriSonSutun
+            hedefWS.Cells(yazilacakSatir, jSut).Value = sapWS.Cells(iSat, jSut).Value
+        Next jSut
+        yazilacakSatir = yazilacakSatir + 1
+Atla:
+    Next iSat
+    sapWB.Close False
+    MsgBox "Veriler aktarıldı. Güncelleme tamamlandı.", vbInformation
+Temizlik:
+    Application.ScreenUpdating = True
+    Application.Calculation = xlCalculationAutomatic
+    Application.EnableEvents = True
+End Sub
+</code></pre>`,sideHtml: `<p>Öncelikle bu makronun yaptıkları:</p>
+<ol>
+  <li><strong>Performansı artırmak için hazırlık yapar</strong>
+    <ul>
+      <li>Ekran yenilemeyi, otomatik hesaplamayı ve olay tetikleyicilerini geçici olarak kapatır.</li>
+      <li>Makro bitince tüm ayarları eski haline döndürür.</li>
+    </ul>
+  </li>
+
+  <li><strong>Çalışma kapsamını ve referans zamanı belirler</strong>
+    <ul>
+      <li>İndirilenler klasörünü tarar.</li>
+      <li>“stok” geçen .xlsx dosyalarını ve <em>referansTarih</em>’ten sonra değiştirilmiş olanları filtreler.</li>
+    </ul>
+  </li>
+
+  <li><strong>En güncel dosyayı seçer</strong>
+    <ul>
+      <li>Filtrelenenler arasından son değiştirilme tarihine göre en güncel dosyayı bulur.</li>
+      <li>Aynı güne ait kaç dosya olduğunu sayar (bilgi amaçlı).</li>
+      <li>Dosyayı salt-okunur açar ve ilk sayfayı kullanır.</li>
+    </ul>
+  </li>
+
+  <li><strong>Veri aralığını tespit eder ve doğrular</strong>
+    <ul>
+      <li>Veri başlangıç satırını 3 olarak alır; son dolu satır ve sütunu dinamik hesaplar.</li>
+      <li>Veri yoksa kullanıcıyı uyarır ve temizce çıkar.</li>
+    </ul>
+  </li>
+
+  <li><strong>Hedef sayfayı hazırlar</strong>
+    <ul>
+      <li>Hedef çalışma sayfası: <code>Stok-scwm.mon</code>. Yoksa uyarı verir.</li>
+      <li>Önceden aynı “Güncelleme Tarihi” bloğu varsa o satır aralığını bulup siler (çift kayıt önler).</li>
+      <li>Üst bilgi hücresine güncel zaman damgası yazar: <em>“Güncelleme Tarihi: gg.aa.yyyy ss:dd:ss”</em>.</li>
+    </ul>
+  </li>
+
+  <li><strong>Verileri temizleyerek kopyalar</strong>
+    <ul>
+      <li>Satırları baştan sona dolaşır; tamamen boş satırları atlar.</li>
+      <li>“SBU”, “Firma”, “Tanım” gibi başlık/etiket satırlarını elemeden geçirip kopyalamaz.</li>
+      <li>Geçerli satırları kaynak dosyadan hedef sayfaya hücre hücre yazar.</li>
+    </ul>
+  </li>
+
+  <li><strong>Kapanış ve bilgilendirme</strong>
+    <ul>
+      <li>Kaynak dosyayı kaydetmeden kapatır.</li>
+      <li>“Veriler aktarıldı. Güncelleme tamamlandı.” mesajını gösterir.</li>
+    </ul>
+  </li>
+</ol>
+
+<p>Ve bu makronun sağladığı iyileştirmeler:</p>
+<ul>
+  <li><strong>Güncellik garantisi:</strong> İndirilenler’deki en son stok dosyasını otomatik seçer.</li>
+  <li><strong>Çift kayıt önleme:</strong> Aynı tarih başlığına ait eski bloğu silerek mükerrer veri riskini ortadan kaldırır.</li>
+  <li><strong>Gürültü temizliği:</strong> Boş satırları ve “SBU/Firma/Tanım” gibi başlık satırlarını atlayarak tabloyu sadeleştirir.</li>
+  <li><strong>İzlenebilirlik:</strong> Üste zaman damgası yazar; ne zaman güncellendiği net görünür.</li>
+  <li><strong>Hız ve stabilite:</strong> Hesaplama/ekran güncellemelerini kapatarak aktarımı hızlı ve sorunsuz yapar.</li>
+  <li><strong>Hata riskini azaltma:</strong> Dosya/dizin kontrolleri ve kullanıcı uyarılarıyla yanlış dosya veya boş veri durumlarını güvenle yakalar.</li>
+</ul>`
+            },
+            excel3: {
+                title: `SAP_Sevkiyat_VeriCekme()   &#x279C;<img src="{% static 'makro-2.png' %}" alt="Makro 3" style="height:72px; vertical-align:middle; margin-left:8px;">`,
+                html: `<pre class="code-block"><code>Sub SAP_Sevkiyat_VeriCekme()
+    Application.ScreenUpdating = False
+    Application.Calculation = xlCalculationManual
+    Application.EnableEvents = False
+    Dim referansTarih As Date
+    referansTarih = DateSerial(2025, 7, 17) + TimeSerial(11, 3, 0)
+    Dim indirilenlerYolu As String
+    indirilenlerYolu = Environ("USERPROFILE") & "\Downloads\"
+    Dim fso As Object, klasor As Object, dosya As Object
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    Set klasor = fso.GetFolder(indirilenlerYolu)
+    Dim dosyaListesi As Collection: Set dosyaListesi = New Collection
+    For Each dosya In klasor.Files
+        If LCase(Right(dosya.Name, 5)) = ".xlsx" And InStr(LCase(dosya.Name), "sevkiyat") > 0 Then
+            If dosya.DateLastModified > referansTarih Then
+                dosyaListesi.Add dosya
+            End If
+        End If
+    Next
+    If dosyaListesi.Count = 0 Then
+        MsgBox "İndirilenlerde uygun Sevkiyat dosyası bulunamadı!", vbCritical
+        GoTo Temizlik
+    End If
+    Dim enSonDosya As String: enSonDosya = ""
+    Dim enSonTarih As Date: enSonTarih = 0
+    Dim enSonDosyaTarihi As Date
+    For Each dosya In dosyaListesi
+        If dosya.DateLastModified > enSonTarih Then
+            enSonTarih = dosya.DateLastModified
+            enSonDosya = dosya.Path
+            enSonDosyaTarihi = Int(dosya.DateLastModified)
+        End If
+    Next
+    Dim ayniGunDosyaSayisi As Integer: ayniGunDosyaSayisi = 0
+    For Each dosya In dosyaListesi
+        If Int(dosya.DateLastModified) = enSonDosyaTarihi Then
+            ayniGunDosyaSayisi = ayniGunDosyaSayisi + 1
+        End If
+    Next
+    Dim sapWB As Workbook: Set sapWB = Workbooks.Open(enSonDosya, ReadOnly:=True)
+    Dim sapWS As Worksheet: Set sapWS = sapWB.Sheets(1)
+    Dim veriBasSatir As Long: veriBasSatir = 2
+    Dim veriSonSatir As Long, veriSonSutun As Long
+    veriSonSatir = sapWS.Cells(sapWS.Rows.Count, 1).End(xlUp).Row
+    veriSonSutun = sapWS.Cells(veriBasSatir, sapWS.Columns.Count).End(xlToLeft).Column
+    If veriSonSatir < veriBasSatir Then
+        MsgBox "SAP dosyasında veri bulunamadı!", vbExclamation
+        sapWB.Close False
+        GoTo Temizlik
+    End If
+    Dim hedefWS As Worksheet
+    On Error Resume Next
+    Set hedefWS = ThisWorkbook.Sheets("Sevkiyat-ZSASASD225_paz")
+    On Error GoTo 0
+    If hedefWS Is Nothing Then
+        MsgBox "Hedef sayfa bulunamadı: Sevkiyat-ZSASASD225_paz", vbCritical
+        sapWB.Close False
+        GoTo Temizlik
+    End If
+    Dim uzerineYazilsin As Boolean: uzerineYazilsin = True
+    If uzerineYazilsin Then
+        Dim sRow As Long, eRow As Long
+        sRow = 0: eRow = 0
+        Dim i As Long
+        For i = hedefWS.Cells(hedefWS.Rows.Count, 1).End(xlUp).Row To 2 Step -1
+            If InStr(1, hedefWS.Cells(i, 1).Text, "Güncelleme Tarihi: " & Format(enSonDosyaTarihi, "dd.mm.yyyy"), vbTextCompare) > 0 Then
+                sRow = i
+                Exit For
+            End If
+        Next i
+        If sRow > 0 Then
+            eRow = sRow
+            Do While hedefWS.Cells(eRow + 1, 1).Value <> "" And Left(hedefWS.Cells(eRow + 1, 1).Value, 18) <> "Güncelleme Tarihi"
+                eRow = eRow + 1
+            Loop
+            If sRow > 1 Then hedefWS.Rows(sRow & ":" & eRow).Delete
+        End If
+    End If
+    hedefWS.Range("A1").Value = "Güncelleme Tarihi: " & Format(Now, "dd.mm.yyyy HH:nn:ss")
+    Dim yazilacakSatir As Long
+    yazilacakSatir = hedefWS.Cells(hedefWS.Rows.Count, 1).End(xlUp).Row + 1
+    If yazilacakSatir < 3 Then yazilacakSatir = 3
+    Dim iSat As Long, jSut As Long
+    For iSat = veriBasSatir To veriSonSatir
+        If WorksheetFunction.CountA(sapWS.Rows(iSat)) = 0 Then GoTo Atla
+        If Not IsEmpty(sapWS.Cells(iSat, 1).Value) Then
+            Dim ilkHuc As Variant
+            ilkHuc = sapWS.Cells(iSat, 1).Value
+            If VarType(ilkHuc) = vbString Then
+                If ilkHuc = "SBU" Or InStr(ilkHuc, "Firma") > 0 Or InStr(ilkHuc, "Tanım") > 0 Then GoTo Atla
+            End If
+        End If
+        For jSut = 1 To veriSonSutun
+            hedefWS.Cells(yazilacakSatir, jSut).Value = sapWS.Cells(iSat, jSut).Value
+        Next jSut
+        yazilacakSatir = yazilacakSatir + 1
+Atla:
+    Next iSat
+    sapWB.Close False
+    MsgBox "Veriler aktarıldı. Güncelleme tamamlandı.", vbInformation
+Temizlik:
+    Application.ScreenUpdating = True
+    Application.Calculation = xlCalculationAutomatic
+    Application.EnableEvents = True
+End Sub
+</code></pre>`,sideHtml: `<p>Öncelikle bu makronun yaptıkları:</p>
+<ol>
+  <li><strong>Performansı artırmak için hazırlık yapar</strong>
+    <ul>
+      <li>Ekran yenilemeyi, otomatik hesaplamayı ve olay tetikleyicilerini geçici olarak kapatır.</li>
+      <li>Makro bitince tüm ayarları eski haline döndürür.</li>
+    </ul>
+  </li>
+
+  <li><strong>Çalışma kapsamını ve referans zamanı belirler</strong>
+    <ul>
+      <li>İndirilenler klasörünü tarar.</li>
+      <li>Adında “sevkiyat” geçen <code>.xlsx</code> dosyalarını ve <em>referansTarih</em>’ten sonra değiştirilmiş olanları filtreler.</li>
+    </ul>
+  </li>
+
+  <li><strong>En güncel dosyayı seçer</strong>
+    <ul>
+      <li>Filtrelenenler arasından son değiştirilme tarihine göre en güncel dosyayı bulur.</li>
+      <li>Aynı güne ait kaç dosya olduğunu sayar (bilgi amaçlı).</li>
+      <li>Dosyayı salt-okunur açar ve ilk sayfayı kullanır.</li>
+    </ul>
+  </li>
+
+  <li><strong>Veri aralığını tespit eder ve doğrular</strong>
+    <ul>
+      <li>Veri başlangıç satırını 2 olarak alır; son dolu satır ve sütunu dinamik hesaplar.</li>
+      <li>Veri yoksa kullanıcıyı uyarır ve temizce çıkar.</li>
+    </ul>
+  </li>
+
+  <li><strong>Hedef sayfayı hazırlar</strong>
+    <ul>
+      <li>Hedef çalışma sayfası: <code>Sevkiyat-ZSASASD225_paz</code>. Yoksa uyarı verir.</li>
+      <li><em>Üzerine yaz</em> modu (True) açık ise, aynı “Güncelleme Tarihi” başlığına ait eski bloğu bulup siler.</li>
+      <li>Üst bilgi hücresine güncel zaman damgası yazar: <em>“Güncelleme Tarihi: gg.aa.yyyy ss:dd:ss”</em>.</li>
+    </ul>
+  </li>
+
+  <li><strong>Verileri temizleyerek kopyalar</strong>
+    <ul>
+      <li>Satırları baştan sona dolaşır; tamamen boş satırları atlar.</li>
+      <li>“SBU”, “Firma”, “Tanım” gibi başlık/etiket satırlarını elemeden geçirip kopyalamaz.</li>
+      <li>Geçerli satırları kaynak dosyadan hedef sayfaya hücre hücre yazar; yazma satırını gerektiğinde artırır.</li>
+    </ul>
+  </li>
+
+  <li><strong>Kapanış ve bilgilendirme</strong>
+    <ul>
+      <li>Kaynak dosyayı kaydetmeden kapatır.</li>
+      <li>“Veriler aktarıldı. Güncelleme tamamlandı.” mesajını gösterir.</li>
+    </ul>
+  </li>
+</ol>
+
+<p>Ve bu makronun sağladığı iyileştirmeler:</p>
+<ul>
+  <li><strong>Güncellik garantisi:</strong> İndirilenler’deki en son sevkiyat dosyasını otomatik seçer.</li>
+  <li><strong>Çift kayıt önleme:</strong> Aynı tarih başlığına ait eski bloğu silebildiği için mükerrer veri riskini ortadan kaldırır.</li>
+  <li><strong>Gürültü temizliği:</strong> Boş ve başlık satırlarını atlayarak tabloyu sade ve analiz edilebilir tutar.</li>
+  <li><strong>İzlenebilirlik:</strong> Üstte zaman damgası ile ne zaman güncellendiği net görünür.</li>
+  <li><strong>Esneklik:</strong> Üzerine yazma modu ile eski bloğu temizleyebilir; kapatılırsa (False) ekleme mantığıyla çalışır.</li>
+  <li><strong>Hız ve stabilite:</strong> Hesaplama/ekran güncellemelerini kapatarak aktarımı hızlı ve sorunsuz yapar.</li>
+</ul>`
+            },
+            excel4: {
+                title: `SAP_Bakiye_VeriCekme()   &#x279C;<img src="{% static 'makro-2.png' %}" alt="Makro 4" style="height:72px; vertical-align:middle; margin-left:8px;">`,
+                html: `<pre class="code-block"><code>Sub SAP_Bakiye_VeriCekme()
+    Application.ScreenUpdating = False
+    Application.Calculation = xlCalculationManual
+    Application.EnableEvents = False
+    Dim referansTarih As Date
+    referansTarih = DateSerial(2025, 7, 17) + TimeSerial(11, 3, 0)
+    Dim indirilenlerYolu As String
+    indirilenlerYolu = Environ("USERPROFILE") & "\Downloads\"
+    Dim fso As Object, klasor As Object, dosya As Object
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    Set klasor = fso.GetFolder(indirilenlerYolu)
+    Dim dosyaListesi As Collection: Set dosyaListesi = New Collection
+    Dim tempPath As String
+    Dim tempTarih As Date
+    For Each dosya In klasor.Files
+        If LCase(Right(dosya.Name, 5)) = ".xlsx" And InStr(LCase(dosya.Name), "bakiye") > 0 Then
+            If dosya.DateLastModified > referansTarih Then
+                dosyaListesi.Add dosya
+            End If
+        End If
+    Next
+    If dosyaListesi.Count = 0 Then
+        MsgBox "İndirilenlerde uygun Bakiye dosyası bulunamadı!", vbCritical
+        GoTo Temizlik
+    End If
+    Dim enSonDosya As String: enSonDosya = ""
+    Dim enSonTarih As Date: enSonTarih = 0
+    Dim enSonDosyaTarihi As Date
+    For Each dosya In dosyaListesi
+        If dosya.DateLastModified > enSonTarih Then
+            enSonTarih = dosya.DateLastModified
+            enSonDosya = dosya.Path
+            enSonDosyaTarihi = Int(dosya.DateLastModified)
+        End If
+    Next
+    Dim ayniGunDosyaSayisi As Integer: ayniGunDosyaSayisi = 0
+    For Each dosya In dosyaListesi
+        If Int(dosya.DateLastModified) = enSonDosyaTarihi Then
+            ayniGunDosyaSayisi = ayniGunDosyaSayisi + 1
+        End If
+    Next
+    Dim sapWB As Workbook: Set sapWB = Workbooks.Open(enSonDosya, ReadOnly:=True)
+    Dim sapWS As Worksheet: Set sapWS = sapWB.Sheets(1)
+    Dim veriBasSatir As Long: veriBasSatir = 3
+    Dim veriSonSatir As Long, veriSonSutun As Long
+    veriSonSatir = sapWS.Cells(sapWS.Rows.Count, 1).End(xlUp).Row
+    veriSonSutun = sapWS.Cells(veriBasSatir, sapWS.Columns.Count).End(xlToLeft).Column
+    If veriSonSatir < veriBasSatir Then
+        MsgBox "SAP dosyasında veri bulunamadı!", vbExclamation
+        sapWB.Close False
+        GoTo Temizlik
+    End If
+    Dim hedefWS As Worksheet
+    On Error Resume Next
+    Set hedefWS = ThisWorkbook.Sheets("Bakiye-ZSD0040")
+    On Error GoTo 0
+    If hedefWS Is Nothing Then
+        MsgBox "Hedef sayfa bulunamadı: Bakiye-ZSD0040", vbCritical
+        sapWB.Close False
+        GoTo Temizlik
+    End If
+    Dim sRow As Long, eRow As Long
+    sRow = 0: eRow = 0
+    Dim i As Long
+    For i = hedefWS.Cells(hedefWS.Rows.Count, 1).End(xlUp).Row To 2 Step -1
+        If InStr(1, hedefWS.Cells(i, 1).Text, "Güncelleme Tarihi: " & Format(enSonDosyaTarihi, "dd.mm.yyyy"), vbTextCompare) > 0 Then
+            sRow = i
+            Exit For
+        End If
+    Next i
+
+    If sRow > 0 Then
+        eRow = sRow
+        Do While hedefWS.Cells(eRow + 1, 1).Value <> "" And Left(hedefWS.Cells(eRow + 1, 1).Value, 18) <> "Güncelleme Tarihi"
+            eRow = eRow + 1
+        Loop
+        If sRow > 1 Then hedefWS.Rows(sRow & ":" & eRow).Delete
+    End If
+    hedefWS.Range("A1").Value = "Güncelleme Tarihi: " & Format(Now, "dd.mm.yyyy HH:nn:ss")
+    Dim yazilacakSatir As Long
+    yazilacakSatir = 3
+    If yazilacakSatir < 3 Then yazilacakSatir = 3
+    Dim iSat As Long, jSut As Long
+    For iSat = veriBasSatir To veriSonSatir
+        If WorksheetFunction.CountA(sapWS.Rows(iSat)) = 0 Then GoTo Atla
+        If Not IsEmpty(sapWS.Cells(iSat, 1).Value) Then
+            Dim ilkHuc As Variant
+            ilkHuc = sapWS.Cells(iSat, 1).Value
+            If VarType(ilkHuc) = vbString Then
+                If ilkHuc = "SBU" Or InStr(ilkHuc, "Firma") > 0 Or InStr(ilkHuc, "Tanım") > 0 Then GoTo Atla
+            End If
+        End If
+        For jSut = 1 To veriSonSutun
+            hedefWS.Cells(yazilacakSatir, jSut).Value = sapWS.Cells(iSat, jSut).Value
+        Next jSut
+        yazilacakSatir = yazilacakSatir + 1
+Atla:
+    Next iSat
+    sapWB.Close False
+    MsgBox "Veriler aktarıldı. Güncelleme tamamlandı.", vbInformation
+Temizlik:
+    Application.ScreenUpdating = True
+    Application.Calculation = xlCalculationAutomatic
+    Application.EnableEvents = True
+End Sub
+</code></pre>`,sideHtml: `<p>Öncelikle bu makronun yaptıkları:</p>
+<ol>
+  <li><strong>Performansı artırmak için hazırlık yapar</strong>
+    <ul>
+      <li>Çalışma süresince ekran yenilemeyi, otomatik hesaplamayı ve olay tetiklemeyi geçici olarak devre dışı bırakır.</li>
+      <li>Makro tamamlandığında bu ayarları eski haline döndürür.</li>
+    </ul>
+  </li>
+
+  <li><strong>Çalışma kapsamını ve zaman filtresini belirler</strong>
+    <ul>
+      <li>İndirilenler klasöründe, adında “bakiye” geçen <code>.xlsx</code> dosyalarını tarar.</li>
+      <li><em>referansTarih</em>’ten sonra değiştirilmiş dosyaları filtreler.</li>
+    </ul>
+  </li>
+
+  <li><strong>En güncel dosyayı tespit eder</strong>
+    <ul>
+      <li>Filtrelenenler arasından son değiştirilme tarihine göre en güncel dosyayı seçer.</li>
+      <li>Aynı güne ait dosya sayısını belirler (bilgi amaçlı).</li>
+      <li>Seçilen dosyayı salt-okunur olarak açar ve ilk sayfayı hedefler.</li>
+    </ul>
+  </li>
+
+  <li><strong>Veri aralığını tanımlar ve kontrol eder</strong>
+    <ul>
+      <li>Veri başlangıç satırını 3 olarak alır; son dolu satır ve sütunu otomatik bulur.</li>
+      <li>Veri yoksa kullanıcıya uyarı verir ve işlemden çıkar.</li>
+    </ul>
+  </li>
+
+  <li><strong>Hedef sayfayı hazırlar</strong>
+    <ul>
+      <li>Hedef çalışma sayfası: <code>Bakiye-ZSD0040</code>. Yoksa hata mesajı verir.</li>
+      <li>Aynı “Güncelleme Tarihi”ne sahip eski veri bloğunu bulur ve siler.</li>
+      <li>Üst bilgi hücresine yeni zaman damgası ekler: <em>“Güncelleme Tarihi: gg.aa.yyyy ss:dd:ss”</em>.</li>
+    </ul>
+  </li>
+
+  <li><strong>Verileri temizleyerek aktarır</strong>
+    <ul>
+      <li>Boş satırları ve “SBU”, “Firma”, “Tanım” gibi başlık satırlarını atlar.</li>
+      <li>Kalan satırları hücre hücre hedef sayfaya kopyalar.</li>
+      <li>Yazma konumunu her eklemede ilerletir.</li>
+    </ul>
+  </li>
+
+  <li><strong>Kapanış ve bilgilendirme</strong>
+    <ul>
+      <li>Kaynak dosyayı kaydetmeden kapatır.</li>
+      <li>Kullanıcıya “Veriler aktarıldı. Güncelleme tamamlandı.” mesajını gösterir.</li>
+    </ul>
+  </li>
+</ol>
+
+<p>Ve bu makronun sağladığı iyileştirmeler:</p>
+<ul>
+  <li><strong>En güncel veriye erişim:</strong> İndirilenler’deki en son bakiye dosyasını otomatik olarak bulur.</li>
+  <li><strong>Temizlik ve düzen:</strong> Eski veri bloklarını silerek sayfanın güncel ve düzenli kalmasını sağlar.</li>
+  <li><strong>Gereksiz satırları atlama:</strong> Boş ve başlık satırlarını kopyalamayarak tabloyu temiz tutar.</li>
+  <li><strong>Net zaman bilgisi:</strong> Güncelleme zamanını üstte göstererek izlenebilirlik sağlar.</li>
+  <li><strong>Hızlı ve kararlı çalışma:</strong> Performans optimizasyonları sayesinde aktarım sürecini hızlandırır.</li>
+  <li><strong>Manuel iş yükünü azaltma:</strong> Tek tuşla veriyi tespit edip aktarır, elle müdahale ihtiyacını ortadan kaldırır.</li>
+</ul>`
+            },
+            excel5: {
+                title: "Worksheet_Change(ByVal Target As Range) - 1",
+                html: `<pre class="code-block"><code>Private Sub Worksheet_Change(ByVal Target As Range)
+    On Error GoTo Cleanup
+    Application.EnableEvents = False
+    Dim rngKod As Range, rngKostik As Range
+    Dim cell As Range, foundProd As Range
+    Dim origDate As Variant, targetDate As Date
+    Dim lr As Long, i As Long, foundRow As Long
+    Dim tgt As Range
+    Const kostikThreshold As Date = #7/28/2025 2:00:00 PM#
+    Set rngKod = Intersect(Target, Me.Range("D:D,T:T,AB:AB,AR:AR,AZ:AZ,BH:BH,BP:BP,BX:BX"))
+    If Not rngKod Is Nothing Then
+        For Each cell In rngKod.Cells
+            If Len(cell.Value) > 0 Then
+                Set foundProd = Sheets("Sipariş Takip (2)").Columns("A") _
+                                .Find(What:=cell.Value, LookAt:=xlWhole, LookIn:=xlValues)
+                If Not foundProd Is Nothing Then
+                    cell.Offset(0, 1).Value = foundProd.Offset(0, 1).Value
+                Else
+                    MsgBox "Bu ürün kodlu bir ürün bulunmamaktadır.", vbExclamation, "Uyarı"
+                    cell.ClearContents: cell.Offset(0, 1).ClearContents
+                End If
+            Else
+                cell.Offset(0, 1).ClearContents
+            End If
+        Next cell
+    End If
+    Set rngKostik = Intersect(Target, Me.Range("BD:BD,BL:BL,BT:BT"))
+    If Not rngKostik Is Nothing Then
+        If Now < kostikThreshold Then GoTo SkipKostik
+        For Each cell In rngKostik.Cells
+            If StrComp(Trim(cell.Value), "kostik yıkama", vbTextCompare) = 0 Then
+                origDate = Me.Cells(cell.Row, "C").Value
+                If IsDate(origDate) Then
+                    targetDate = DateValue(origDate) + 13
+                    lr = Me.Cells(Me.Rows.Count, "C").End(xlUp).Row
+                    foundRow = 0
+                    For i = 1 To lr
+                        If IsDate(Me.Cells(i, "C").Value) Then
+                            If DateValue(Me.Cells(i, "C").Value) = targetDate Then
+                                foundRow = i
+                                Exit For
+                            End If
+                        End If
+                    Next i
+                    If foundRow > 0 Then
+                        Set tgt = Me.Cells(foundRow, cell.Column)
+                        If Trim(tgt.Value) = "" Then
+                            tgt.Value = "Kostik yıkama"
+                            tgt.Font.Color = vbRed
+                        End If
+                    End If
+                End If
+            End If
+        Next cell
+    End If
+SkipKostik:
+Cleanup:
+    Application.EnableEvents = True
+End Sub
+</code></pre>`,sideHtml: `<p>Öncelikle bu makronun yaptıkları:</p>
+<ol>
+  <li><strong>Olay işleme kontrolü</strong>
+    <ul>
+      <li>Çalışma sırasında olası tetiklenme döngülerini önlemek için <em>Application.EnableEvents</em> kapatılır.</li>
+    </ul>
+  </li>
+
+  <li><strong>Ürün kodu eşleştirme</strong>
+    <ul>
+      <li>Değişiklik yapılan hücreler, belirli sütun aralıkları (<code>D, T, AB, AR, AZ, BH, BP, BX</code>) içinde kontrol edilir.</li>
+      <li>Bu hücrelerde değer varsa, “Sipariş Takip (2)” sayfasının A sütununda birebir arama yapılır.</li>
+      <li>Eşleşme bulunursa, yanındaki hücreye (kodun hemen sağındaki hücre) ilgili bilgiyi kopyalar.</li>
+      <li>Bulunamazsa uyarı verir ve hem kodu hem de yan hücreyi temizler.</li>
+      <li>Hücre boşsa yan hücre de temizlenir.</li>
+    </ul>
+  </li>
+
+  <li><strong>Kostik yıkama planlama</strong>
+    <ul>
+      <li>Değişiklik yapılan hücreler, belirli sütunlar (<code>BD, BL, BT</code>) içinde kontrol edilir.</li>
+      <li>Sistem tarihi, belirlenen eşik tarihten (<code>28.07.2025 14:00</code>) önceyse bu bölüm çalışmaz.</li>
+      <li>Hücre değeri “kostik yıkama” ise, aynı satırın C sütunundaki tarih alınır.</li>
+      <li>Tarihe +13 gün eklenir ve bu yeni tarih C sütununda aranır.</li>
+      <li>13 günlük aralık, kostik yıkamanın standartta 13 günde bir yapılması planından kaynaklanır. Bu süre aralığı, düzenli bakım için belirlenmiştir.</li>
+      <li>Herhangi bir sapma veya özel durum söz konusu olduğunda, bu girişin manuel olarak yapılabilmesi için esneklik bırakılmıştır.</li>
+      <li>Bulunan satırda, aynı sütundaki hücre boşsa “Kostik yıkama” yazılır ve kırmızıya boyanır.</li>
+    </ul>
+  </li>
+
+  <li><strong>Kapatma ve temizlik</strong>
+    <ul>
+      <li>Makro tamamlandığında <em>Application.EnableEvents</em> tekrar açılır.</li>
+    </ul>
+  </li>
+</ol>
+
+<p>Ve bu makronun sağladığı iyileştirmeler:</p>
+<ul>
+  <li><strong>Otomatik veri tamamlama:</strong> Ürün kodu girildiğinde ilgili bilgiyi otomatik olarak yan hücreye doldurur.</li>
+  <li><strong>Hataları azaltma:</strong> Yanlış ürün kodlarında uyarı vererek yanlış veri girişini engeller.</li>
+  <li><strong>Bakım planlama kolaylığı:</strong> Kostik yıkama işlemlerini tarih bazlı otomatik planlar.</li>
+  <li><strong>Görsel uyarı:</strong> Kostik yıkama hücresini kırmızı renkle belirginleştirir.</li>
+  <li><strong>Zaman tasarrufu:</strong> Manuel arama ve planlama ihtiyacını ortadan kaldırır.</li>
+  <li><strong>Olay döngüsü önleme:</strong> Kod içinde olay tetiklenmelerini devre dışı bırakarak stabil çalışmayı sağlar.</li>
+</ul>`
+            },
+            excel6: {
+                title: "Worksheet_Change(ByVal Target As Range) - 2",
+                html: `<pre class="code-block"><code>Private Sub Worksheet_Change(ByVal Target As Range)
+    On Error GoTo CleanExit
+    Application.EnableEvents = False
+    If Not Intersect(Target, Me.Rows("6:" & Me.Rows.Count)) Is Nothing Then
+        Me.Range("B2").Value = Me.Range("B3").Value
+        Me.Range("B3").Value = Now
+    End If
+CleanExit:
+    Application.EnableEvents = True
+End Sub
+</code></pre>`,sideHtml: `<p>Öncelikle bu makronun yaptıkları:</p>
+<ol>
+  <li><strong>Olay işleme kontrolü</strong>
+    <ul>
+      <li>Makro çalışmaya başlamadan önce <em>Application.EnableEvents</em> kapatılır.</li>
+      <li>Böylece hücre değişikliklerinden kaynaklanan olası sonsuz döngüler veya tekrar tetiklenmeler önlenir.</li>
+    </ul>
+  </li>
+
+  <li><strong>Hedef alanın kontrolü</strong>
+    <ul>
+      <li>Yapılan değişiklik, çalışma sayfasının 6. satır ve sonrası (<code>6:Son Satır</code>) aralığında mı diye kontrol edilir.</li>
+      <li>Bu sayede gereksiz durumlarda kodun çalışması engellenir.</li>
+    </ul>
+  </li>
+
+  <li><strong>Tarih bilgilerini güncelleme</strong>
+    <ul>
+      <li>Eğer değişiklik hedef aralıkta yapılmışsa, <code>B2</code> hücresine mevcut <code>B3</code> hücresindeki değer kopyalanır.</li>
+      <li><code>B3</code> hücresine ise o anki tarih-saat (<code>Now</code>) yazılır.</li>
+      <li>Bu işlem, en son değişiklik zamanının kaydını tutmak için kullanılır.</li>
+    </ul>
+  </li>
+
+  <li><strong>Kapatma ve temizlik</strong>
+    <ul>
+      <li>Makro tamamlandığında <em>Application.EnableEvents</em> tekrar açılır.</li>
+      <li>Bu sayede Excel normal çalışma moduna geri döner.</li>
+    </ul>
+  </li>
+</ol>
+
+<p>Ve bu makronun sağladığı iyileştirmeler:</p>
+<ul>
+  <li><strong>Otomatik zaman kaydı:</strong> Sayfada yapılan değişikliklerin tarih ve saat bilgisi otomatik olarak tutulur.</li>
+  <li><strong>Geçmişin korunması:</strong> Önceki değişiklik zamanı <code>B2</code> hücresinde saklanır.</li>
+  <li><strong>Hedef odaklı çalışma:</strong> Yalnızca belirlenen satırlarda çalıştığı için performans kaybı yaşanmaz.</li>
+  <li><strong>Stabil çalışma:</strong> Olay tetiklenmelerini devre dışı bırakarak makronun sorunsuz çalışmasını sağlar.</li>
+  <li><strong>Hata önleme:</strong> Gereksiz tetiklemeler engellenerek yanlış kayıtların önüne geçilir.</li>
+</ul>`
+            },
+        };
+
+        const modal = document.getElementById('excelModal');
+
+        const mainBox    = document.getElementById('mainBox');
+        const sideBox    = document.getElementById('sideBox');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody  = document.getElementById('modalBody');
+        const sideTitle  = document.getElementById('sideTitle');
+        const sideBody   = document.getElementById('sideBody');
+
+        // Tıklamalar
+        document.querySelectorAll('.icons-row img[data-modal]').forEach(img => {
+            img.addEventListener('click', () => {
+                const key  = img.getAttribute('data-modal');
+                const data = excelModalData[key];
+                if (!data) return;
+
+                // Ana kutu
+                modalTitle.innerHTML = data.title || '';
+                modalBody.innerHTML    = data.html  || '';
+
+                // Sağ panel açık + içerik (tüm makrolara ek içerik)
+                sideBox.style.display = '';
+                sideTitle.textContent = data.sideTitle || 'Bu Makro Neler Yapar ve Ne İyileştirme Sağlamıştır?';
+                sideBody.innerHTML    = data.sideHtml  || '<p>Ek içerik mevcut değil.</p>';
+                mainBox.classList.remove('single');
+
+                modal.classList.add('active');
+            });
+        });
+
+        // Tüm çarpı butonlarına kapatma olayı ekle
+        document.querySelectorAll('.modal-close').forEach(btn => {
+            btn.addEventListener('click', () => {
+                modal.classList.remove('active');
+            });
+        });
+
+        // Overlay'e tıklayınca kapatma
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.remove('active');
+        });
+
+        // ESC ile kapatma
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') modal.classList.remove('active');
+        });
+
+    </script>
+</body>
+</html>

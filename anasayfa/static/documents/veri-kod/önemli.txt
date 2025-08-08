@@ -1,0 +1,13 @@
+Merhaba, dosyayý çalýþtýrabilmeniz için iki önemli adým mevcut:
+
+1)Kod dosyasýnýn 10. satýrýndaki:
+data = pd.read_csv('C:\\Users\\erhan\\Desktop\\heart.csv')      ve
+
+2)Kod dosyasýnýn 88-89. satýrlarýnda yer alan:
+with open('C:\\Users\\erhan\\Desktop\\heart_disease_results.json', 'w') as f:
+    json.dump(output_summary, f) 
+
+kýsýmlarýndaki dosyalarýn dizinlerini C:\\Users\\erhan\\Desktop yerine sizin sisteminizde
+var olan dizin olarak güncellemeniz gerekmektedir.
+
+Teþekkür ederim :)

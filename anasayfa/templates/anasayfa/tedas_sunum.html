@@ -1,0 +1,110 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Parametre Bazlı Güç Tahminleyicisi – Sunum</title>
+    <style>
+        .language-buttons {
+            position: fixed;
+            top: 16px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            gap: 12px;
+        }
+
+        .language-buttons img {
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .language-buttons img:hover {
+            transform: scale(1.1);
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url("{% static 'wallpaper-2.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            margin-top: 40px;
+            background-color: rgba(0, 0, 0, 0.75);
+            padding: 30px 50px;
+            border-radius: 14px;
+            width: 95%;
+            max-width: 1200px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 30px;
+            color: #ffe680;
+        }
+
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 2px solid white;
+            border-radius: 10px;
+            background-color: white;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .button-group a {
+            background-color: white;
+            color: black;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: 0.3s ease;
+        }
+
+        .button-group a:hover {
+            background-color: black;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="language-buttons">
+        <a href="{% url 'tedas_sunum' %}">
+            <img src="{% static 'tr.png' %}" alt="Türkçe">
+        </a>
+        <a href="{% url 'tedas_pre' %}">
+            <img src="{% static 'en.png' %}" alt="English">
+        </a>
+    </div>
+    <div class="container">
+        <h1>PARAMETRE BAZLI GÜÇ TAHMİNLEYİCİSİ - SUNUM</h1>
+
+        <iframe src="{% static 'documents/tedaş_sunum.pdf' %}" frameborder="0"></iframe>
+
+        <div class="button-group">
+            <a href="{% url 'proje_staj' %}">Önceki Sayfaya Dön</a>
+            <a href="{% url 'projelerim' %}">Proje Menüsüne Dön</a>
+            <a href="{% url 'merhaba' %}">Ana Sayfaya Dön</a>
+        </div>
+    </div>
+
+</body>
+</html>

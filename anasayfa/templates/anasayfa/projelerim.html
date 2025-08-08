@@ -1,0 +1,1098 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Projeler</title>
+    <style>
+        /* Modern font */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+
+        /* Modal içindeki küçük ikonlar için */
+        .icon {
+        width: 20px;
+        height: 20px;
+        vertical-align: middle;
+        margin-right: 8px;
+        fill: currentColor;
+        }
+
+        .language-buttons {
+            position: fixed;
+            top: 16px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            gap: 12px;
+        }
+
+        .language-buttons img {
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .language-buttons img:hover {
+            transform: scale(1.1);
+        }
+        body {
+            margin: 0;
+            padding: 40px 10px 100px 10px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url("{% static 'wallpaper-2.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+        }
+
+        .intro-box {
+            margin: 0 auto 30px auto;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px 30px;
+            max-width: 900px;
+            text-align: center;
+            border-left: 5px solid #ffd700;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .project-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 15px;
+            box-sizing: border-box;
+        }
+
+        .project-box {
+            cursor: zoom-in;
+            background-color: rgba(0, 0, 0, 0.7); /* Saydam siyah zemin */
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow:
+                0 4px 8px rgba(0, 0, 0, 0.3),
+                0 10px 20px rgba(0, 0, 0, 0.2),
+                inset 0 0 10px rgba(255, 255, 255, 0.05); /* içten hafif ışık */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            height: auto;
+            transform: perspective(1000px) rotateX(1deg) rotateY(-2deg);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .project-box:hover {
+            transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1.02);
+            box-shadow:
+                0 8px 16px rgba(0, 0, 0, 0.4),
+                0 16px 32px rgba(0, 0, 0, 0.3),
+                inset 0 0 15px rgba(255, 255, 255, 0.07);
+        }
+
+        .box-short {
+            min-height: 300px;
+        }
+
+
+        .box-tall {
+            min-height: 520px;
+        }
+
+        .project-button {
+            background: linear-gradient(135deg, #ffd700, #ffcc00);
+            color: #000;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+            transition: all 0.3s ease-in-out;
+            position: relative;
+            overflow: hidden;
+            display: block;
+            text-align: center;
+        }
+
+        .project-button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: skewX(-20deg);
+            transition: left 0.5s;
+        }
+
+        .project-button:hover::before {
+            left: 100%;
+        }
+
+        .project-button:hover {
+            background: #000;
+            color: #fff;
+            box-shadow: 0 4px 25px rgba(255, 255, 255, 0.2);
+        }
+
+        .project-desc {
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .role-box {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #ffd700;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 14.5px;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .button-wrapper {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            gap: 20px;
+            z-index: 9999;
+        }
+
+
+
+        .nav-button {
+            background: #fff;
+            color: #000;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease-in-out;
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .nav-button:hover {
+            background-color: black;
+            color: white;
+        }
+
+        @media (max-width: 1000px) {
+            .project-container {
+                grid-template-columns: 1fr;
+                padding: 0 10px;
+                max-width: 100%;
+            }
+
+            .intro-box {
+                max-width: 100%;
+                padding: 15px 20px;
+            }
+        }
+
+        #scrollProgressContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background-color: rgba(255, 255, 255, 0.1);
+            z-index: 9999;
+        }
+
+        #scrollProgressBar {
+            height: 100%;
+            width: 0%;
+            background-color: #ffd700;
+            transition: width 0.25s ease-out;
+        }
+
+        /* Yeni Scroll Down Indicator Tasarımı */
+        .scroll-down-indicator {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 32px;
+            height: 32px;
+            animation: bounce 1.5s infinite;
+            z-index: 9999;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .scroll-down-indicator svg {
+            width: 100%;
+            height: 100%;
+            fill: #ffd700;
+            filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.6));
+        }
+
+        .scroll-down-indicator:hover {
+            opacity: 1;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        .hide-indicator {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Video Container ve Play Button Stilleri */
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-height: 400px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: black;
+        }
+
+        .video-container video {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+            display: block;
+        }
+
+
+        .hidden-media {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 10, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 95vh;
+            overflow-y: auto;
+            color: white;
+            position: relative;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            font-size: 28px;
+            cursor: pointer;
+            color: white;
+        }
+        .modal-2-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            padding: 20px;
+            overflow-y: auto;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-2-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-2-content {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            color: white;
+            position: relative;
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-2-overlay.active .modal-2-content {
+            transform: scale(1);
+        }
+
+        .modal-2-close {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #ccc;
+            transition: color 0.2s ease;
+        }
+
+        .modal-2-close:hover {
+            color: #ff6b6b;
+        }
+
+        .center-image-modal-2 {
+            width: 180px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            margin: 0 auto 20px;
+            display: block;
+        }
+
+        .modal-2-content h2 {
+            margin: 16px 0;
+            font-size: 26px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-2-content p {
+            font-size: 16px;
+            line-height: 1.5;
+            margin: 12px 0;
+            font-weight: 300;
+        }
+
+        .modal-2-content a {
+            color: #0e76a8;
+            text-decoration: none;
+        }
+
+        .modal-2-content a:hover {
+            text-decoration: underline;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="language-buttons">
+        <a href="{% url 'projelerim' %}">
+            <img src="{% static 'tr.png' %}" alt="Türkçe">
+        </a>
+        <a href="{% url 'projects' %}">
+            <img src="{% static 'en.png' %}" alt="English">
+        </a>
+    </div>
+    <!--Scroll Bar-->
+    <div id="scrollProgressContainer">
+        <div id="scrollProgressBar"></div>
+    </div>    
+    <!-- Açıklama Kutusu -->
+
+    <div class="intro-box">
+        <strong>Başlıklara tıklayarak projelerimin detaylarına ve dosyalarına erişebilirsiniz. Şablonlara tıklayarak ise ilgili projeyi izole bir ekranda görüntüleyebilirsiniz.</strong>
+    </div>
+    <!-- Projeler -->
+    <div class="project-container">
+
+        <!-- 1. Proje: Teslimat Dolabı (Uzun) -->
+        <div class="project-box box-short" data-project-id="tez">
+            <a href="{% url 'proje_tez' %}" class="project-button">
+                ESKİŞEHİR TEPEBAŞI BÖLGESİNDE AKILLI TESLİMAT DOLAPLARINA ERİŞİLEBİLİRLİĞİN İYİLEŞTİRİLEREK YERLEŞTİRİLMESİ PROBLEMİ
+            </a>
+            <p class="project-desc">
+                Lisans Bitirme Projesi kapsamında yapılmış grup çalışmasıdır. Amaç, Küme Kapsama Problemi (Set Covering) ve TOPSIS Metoduyla
+                <strong>Eskişehir/Tepebaşı bölgesindeki 21 adet kentsel mahalle arasından</strong> akıllı teslimat dolaplarının en uygun konumlara yerleştirilmesini
+                amaçlayan <strong>kapsamlı bir karar destek sistemi sunmaktır.</strong> Çözüm süreci, mahallelerin demografik özelliklerine göre TOPSIS yöntemiyle
+                önceliklendirilmesi, mahalleler arası mesafelerin hesaplanarak kapsama matrisinin oluşturulması, Set Covering optimizasyon modeliyle
+                <strong>en az sayıda dolapla maksimum kapsamanın sağlanması</strong> ve <strong>merkezlerin önceliklendirilmesi</strong> adımlarını içerir.
+                Görsel ve etkileşimli bir <strong>HTML arayüz aracılığıyla</strong> kapsama yarıçapı seçilebilmekte ve bu seçim doğrultusunda
+                <strong>sistem otomatik olarak optimizasyonu gerçekleştirmektedir.</strong> Sistem tarafından saptanan merkezlerin
+                <strong>Google Street View görüntüleri kullanıcının bir tık uzağına sunularak</strong> kullanıcı dostu ve pratik bir yapı sağlanmıştır.
+                Elde edilen sonuçlar hem tablo hem harita olarak sunulur ve bu sayede
+                <strong>karar vericilere erişilebilirlik, etkinlik ve öncelik bazlı yerleşim önerileri</strong> sunan dinamik ve bütünleşik bir çözüm elde edilir.
+            </p>
+
+            <div class="role-box">
+                <strong>
+                    Bu projedeki bireysel rollerim; ScribbleMaps ve QGIS yardımıyla mahalle sınırlarının çizimi ve coğrafi koordinatların model tarafından
+                    işlenebilir formata getirilmesi, Adobe Photoshop yardımıyla arayüz ve proje fuarı posteri için görsel oluşturmak, veri analizi,
+                    Python yardımıyla optimizasyon modeli ile kod dizlimini oluşturmak ve HTML arayüzlü bir Karar Destek Sistemi geliştirmek olmuştur.
+                </strong>
+            </div>
+
+            <!-- Şablonun içinde, yazıların altında altlı üstlü görseller -->
+            <div style="margin-top: 20px;">
+                <img src="{% static 'documents/tez-poster.jpeg' %}" alt="Tez Poster"
+                    style="width: 100%; height: auto; max-height: 650px; object-fit: contain; border-radius: 10px; margin-bottom: 12px;">
+                <img src="{% static 'documents/tez-1.jpeg' %}" alt="Tez Görseli 1"
+                    style="width: 100%; height: auto; max-height: 500px; object-fit: contain; border-radius: 10px;">
+            </div>
+            <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                <strong>Orijinal Dil:</strong>
+                <img src="{% static 'tr.png' %}" alt="Türk Bayrağı" style="height: 1.5em; vertical-align: middle;">
+            </div>
+        </div>
+
+
+        <!-- PROJELERİM SAYFASINDAKİ STAJ PROJE KUTUSU -->
+        <div class="project-box box-short" data-project-id="staj">
+            <a href="{% url 'proje_staj' %}" class="project-button">
+                EnerjiSA - SPARK'24: DAĞITIM ŞEBEKELERİNDE GÜÇ TRAFOLARININ PARALEL BAĞLANMA PRENSİPLERİ
+            </a>
+            
+            <p class="project-desc">
+                02.07.2024 - 30.07.2024 tarihleri arasında EnerjiSA - Toroslar EDAŞ bünyesinde yapmış olduğum Zorunlu Yönetim Stajım kapsamında grup arkadaşlarım ve grup koçumuz Ahmet CANBOLAT ile birlikte gerçekleştirdiğimiz projede <strong>üstlendiğim kısımlar ve gerçekleştirmiş olduğum çalışmaları içermektedir.</strong> Amaç, Dağıtım Şebekelerinde <strong>Güç Trafolarının Paralel Bağlanma Prensipleri</strong> doğrultusunda Mersin Metropol Bölgesinde yer alan <strong>14 indirici merkezin gözlemlenen puant değerlerine sıcaklık ve nem oranının</strong> etkisi olup olmadığını saptayarak tahminleme olanakları sağlamak ve çıktıları analiz etmek olmuştur. Bu bağlamda <strong>01.01.2023 – 30.06.2024 aralığındaki günlük puant değerleri ve trafo kapasiteleri, günlük ortalama sıcaklık değerleri ve günlük ortalama nem oranları</strong> verileri kullanılmıştır.
+            </p>
+
+            <div class="role-box">
+                <strong>
+                Bu projedeki bireysel rollerim; verilerin çekilmesi ve işlenmeye hazır hale getirilmesi, sıcaklık ve nem oranlarının puant değerleri üzerindeki etkilerini incelemek üzere Python diliyle regresyon analizlerinin gerçekleştirilmesi, her bir trafoya ait regresyon denklemlerinin çıkarılması ve bu denklemlerle Parametre Bazlı Güç Tahminleyicisi geliştirilmesidir. Ayrıca, tahmin sonuçları doğrultusunda enerji verimliliği hesaplamaları yapılmış, aktif ortalama güç ve ortalama doluluk oranı kriterlerine göre Pareto analiziyle kritik trafolar belirlenmiş ve tüm bu sürecin görsel sunumu ile proje tanıtım videosu hazırlanmıştır.    
+                </strong>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <img src="{% static 'documents/spark-sunumgrup.jpeg' %}" alt="Sunum Grubu" style="width: 50%; border-radius: 10px;">
+                    <img src="{% static 'documents/spark-r-p.jpeg' %}" alt="Regresyon Puan" style="width: 50%; border-radius: 10px;">
+                </div>
+                <!-- Video Container -->
+                <div class="video-container" style="position: relative; max-width: 100%; border-radius: 10px; overflow: hidden; margin-bottom: 15px;">
+                    <video id="customVideo" preload="metadata" controls
+                        style="width: 100%; border-radius: 10px; cursor: pointer;">
+                        <source src="{% static 'documents/spark-anim.mp4' %}" type="video/mp4">
+                        Tarayıcınız video etiketini desteklemiyor.
+                    </video>
+                    <div id="playButton" class="play-button" title="Oynat" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                        display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; background-color: rgba(0,0,0,0.5); border-radius: 50%; cursor: pointer;">
+                        <svg viewBox="0 0 24 24" fill="white" width="36" height="36">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <script>
+                    const video = document.getElementById('customVideo');
+                    const playButton = document.getElementById('playButton');
+
+                    let hasStarted = false;
+
+                    // Play butonuna tıklayınca videoyu oynat ve butonu gizle
+                    playButton.addEventListener('click', () => {
+                        if (!hasStarted) {
+                            video.play();
+                            hasStarted = true;
+                            playButton.style.display = 'none';
+                        }
+                    });
+
+                    // Video oynatılmaya başlayınca playButton gizlensin
+                    video.addEventListener('play', () => {
+                        playButton.style.display = 'none';
+                    });
+
+                    // Video durduğunda (kullanıcı durdurduysa) playButton görünmesin
+                    video.addEventListener('pause', () => {
+                        if (!video.ended) {
+                            // Butonu gösterme, video durduktan sonra tekrar başlamasın
+                        }
+                    });
+
+                    // Video bittiğinde playButton tekrar gösterilsin ve hasStarted sıfırlansın
+                    video.addEventListener('ended', () => {
+                        playButton.style.display = 'flex';
+                        hasStarted = false;
+                    });
+
+                    // Videoya ekrana tıklayınca oynatma/duraklatmayı engelle
+                    video.addEventListener('click', (e) => {
+                        e.preventDefault();
+                    });
+                </script>
+
+
+
+                <img src="{% static 'documents/spark-rs.jpeg' %}" alt="Regresyon Sıcaklık" 
+                    style="width: 100%; height: 560px; border-radius: 15px; object-fit: fill;">
+            </div>
+            <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                <strong>Orijinal Dil:</strong>
+                <img src="{% static 'tr.png' %}" alt="Türk Bayrağı" style="height: 1.5em; vertical-align: middle;">
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const projectBox = document.querySelector('.project-box.box-short[data-project-id="staj"]');
+                const video = projectBox.querySelector('video');
+                const playButton = projectBox.querySelector('#playButton');
+
+                // 1) Modal açma işlemi - sadece video dışına tıklanınca
+                projectBox.addEventListener('click', function(event) {
+                    // Eğer tıklanan öğe video veya video içindeyse modal açma
+                    if (event.target === video || video.contains(event.target) || event.target === playButton || playButton.contains(event.target)) {
+                        // Video veya play buttona tıklanmış, modal açma
+                        event.stopPropagation(); // modal açılmasını engelle
+                        return;
+                    }
+                    // Video dışına tıklanmışsa modal aç (buraya modal açma kodunu eklemelisin)
+                    // Örnek:
+                    // openModalForProject('staj');
+                    console.log('Modal açılacak: video dışı tıklama algılandı.');
+                });
+
+                // 2) Video üzerine gelince cursor pointer (zoomdan çıkacak)
+                video.style.cursor = 'pointer';
+
+                // 3) Video veya play buttona tıklanınca video oynat
+                function playVideo() {
+                    if (video.paused) {
+                        video.play();
+                        // Play button gizlensin
+                        if (playButton) playButton.style.display = 'none';
+                    } else {
+                        video.pause();
+                        if (playButton) playButton.style.display = 'flex';
+                    }
+                }
+
+                video.addEventListener('click', function(e) {
+                    playVideo();
+                    e.stopPropagation();
+                });
+
+                if (playButton) {
+                    playButton.addEventListener('click', function(e) {
+                        playVideo();
+                        e.stopPropagation();
+                    });
+                }
+            });
+        </script>
+
+        <!-- SASA MAkro -->
+        <div class="project-box box-short" data-project-id="sasa1">
+            <a href="{% url 'proje_sasamakro' %}" class="project-button">
+                SASA POLYESTER A.Ş. - EXCEL VBA & MAKRO İLE ELYAF ÜRETİM PLANLAMASI SÜRECİNE YÖNELİK İYİLEŞTİRME ÇALIŞMALARI 
+            </a>
+            <p class="project-desc">
+                01.07.2025 - 30.07.2025 tarihleri arasında <strong>SASA POLYESTER A.Ş. bünyesinde yapmış olduğum Zorunlu Üretim Stajım</strong> kapsamında yapmış olduğum çalışmamdaki <strong>Excel VBA kodları ve Makro atamaları</strong>, Excel dosyalarında günlük üretim planlarını ve <strong>SAP'den indirilen verileri otomatik olarak yönetmek, güncellemek ve düzenlemek</strong> için geliştirilmiştir. Kodlar; günün tarihini otomatik olarak vurgulama, SAP sisteminden indirilen stok, sevkiyat ve bakiye dosyalarından güncel verileri filtreleyip ilgili sayfalara aktarma, veri bütünlüğünü sağlama, ürün kodlarını doğrulama ve eksik girişleri uyarma gibi görevleri otomatikleştirerek <strong>manuel işlemleri ortadan kaldırmaktadır.</strong> Bu çalışma, süreçlerin hızlandırılması, hata oranlarının düşürülmesi ve veri doğruluğunun artırılması amacıyla SASA Polyester'deki stajım süresince gerçekleştirdiğim <strong>süreç iyileştirme çalışmalarının bir parçası olarak hazırlanmıştır.</strong>
+            </p>
+            <div class="role-box">
+                <strong>Bu proje bireysel bir çalışma olduğundan ötürü bütün dosyalar ve çalışmalar tarafıma aittir.</strong>
+            </div>
+            <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                <strong>Orijinal Dil:</strong>
+                <img src="{% static 'tr.png' %}" alt="Türk Bayrağı" style="height: 1.5em; vertical-align: middle;">
+            </div>
+        </div>
+
+        <!-- GAMS
+        <div class="project-box box-short" data-project-id="proje_sasa2">
+            <a href="{% url 'proje_veri' %}" class="project-button">
+                SASA GAMS
+            </a>
+            <p class="project-desc">
+                SASA'daki GAMS
+            </p>
+            <div class="role-box">
+                <strong>Bu proje bireysel bir çalışma olduğundan ötürü bütün dosyalar ve çalışmalar tarafıma aittir.</strong>
+            </div>
+            <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                <strong>Orijinal Dil:</strong>
+                <img src="{% static 'tr.png' %}" alt="Türk Bayrağı" style="height: 1.5em; vertical-align: middle;">
+            </div>
+        </div>
+        -->
+
+        <!-- 3. Proje: Veri Bilimi -->
+        <div class="project-box box-short" data-project-id="vb">
+            <a href="{% url 'proje_veri' %}" class="project-button">
+                ENM421 - Veri Bilimine Giriş: KALP HASTALIĞI TESPİTİ
+            </a>
+            <p class="project-desc">
+                Bu çalışma, ENM421 - Veri Bilimine Giriş dersi kapsamında gerçekleştirilmiştir. Projede, kalp hastalığı verileri analiz edilerek <strong>eksik değer kontrolü, değişkenlerin standartlaştırılması</strong> ve <strong>görselleştirme</strong> adımları uygulanmıştır. Ardından, veriler <strong>eğitim</strong> ve <strong>test</strong> olarak ikiye ayrılmış ve <strong>Rastgele Orman (Random Forest)</strong> algoritmasıyla bir <strong>sınıflandırma modeli geliştirilmiştir.</strong> Modelin performansı <strong>karışıklık matrisi, doğruluk oranı, precision, recall</strong> ve <strong>F1 skoru gibi metriklerle</strong> değerlendirilmiştir. Ayrıca, <strong>modelin hangi değişkenlere daha çok önem verdiği analiz edilmiş</strong> ve sonuçlar bir JSON dosyasına kaydedilmiştir. Bu proje ile, <strong>veri bilimi teknikleri kullanılarak kalp hastalığını tahmin etmeye yönelik başarılı bir model oluşturulmuştur.</strong>
+            </p>
+            <div class="role-box">
+                <strong>Bu proje bireysel bir çalışma olduğundan ötürü bütün dosyalar ve çalışmalar tarafıma aittir.</strong>
+            </div>
+            <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                <strong>Orijinal Dil:</strong>
+                <img src="{% static 'tr.png' %}" alt="Türk Bayrağı" style="height: 1.5em; vertical-align: middle;">
+            </div>
+        </div>
+        <!-- 4. Proje: Network  -->
+        <div class="project-box box-short" data-project-id="network">
+            <a href="{% url 'proje_network' %}" class="project-button">
+            ENM326 - Ağ Optimizasyonu ve Algoritmaları: HEMŞİRE PERSONEL PLANLAMASI</a>
+            <p class="project-desc">
+                Bu çalışma, ENM326 - Ağ Optimizasyonu ve Algoritmaları dersi kapsamında gerçekleştirilmiştir. Projede, <strong>farklı vardiyalar</strong> ve <strong>departmanlar için hemşire ihtiyacı</strong>,<strong> kapasite sınırları</strong> ve <strong>talepler</strong> göz önünde bulundurularak bir <strong>maksimum akış optimizasyon modeli</strong> kurulmuştur. Modelde, <strong>vardiya</strong> ve <strong>departmanlar</strong> arasındaki <strong>akış değişkenleri</strong> tanımlanmış, <strong>üst-alt sınırlar</strong> ile <strong>talep kısıtlamaları</strong> eklenmiş ve <strong>toplam hemşire sayısını minimize edecek şekilde amaç fonksiyonu belirlenmiştir</strong>. Model <strong>Gurobi</strong> ile çözülmüş, elde edilen <strong>optimal akış değerleri yorumlanmış</strong> ve <strong>sonuçlar detaylı bir ağ grafiği ile katmanlı olarak görselleştirilmiştir</strong>. Böylece, <strong>hemşirelerin vardiya ve departmanlara dağılımı optimize edilerek kaynak kullanımı etkin hale getirilmiştir.</strong>.
+            </p>
+            <div class="role-box">
+                <strong>Bu projede, kodlama sürecini yürütmek, raporu hazırlamak ve sunumu oluşturmak sorumluluklarını üstlendim. Ayrıca, ağ simülasyonlarının gerçekleştirilmesi ve performans analizlerinin yapılması görevlerini de yerine getirdim.</strong>
+            </div>
+            <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                <strong>Orijinal Dil:</strong>
+                <img src="{% static 'en.png' %}" alt="Türk Bayrağı" style="height: 1.5em; vertical-align: middle;">
+            </div>
+        </div>
+        <!-- 5. Proje: Project -->
+        <div class="project-box box-short" data-project-id="pp">
+            <a href="{% url 'proje_project_planning' %}" class="project-button">
+            ENM448 - Proje Planlama ve Yönetimi: FİLM GALASI ETKİNLİĞİ</a>
+            <p class="project-desc">
+                ENM448 - Proje Planlama ve Yönetimi dersi kapsamında, bir film galası organizasyonunu temel alan <strong>örnek bir proje yönetimi</strong> tasarlanmıştır. Bu kapsamda, proje yönetiminin temel adımları olan <strong>planlama, organizasyon</strong> ve <strong>yürütme</strong> süreçleri detaylı biçimde analiz edilmiştir. <strong>Mekan seçimi, güvenlik önlemleri, medya ve tanıtım faaliyetleri, teknik altyapı gereksinimleri, lojistik hizmetler</strong> ve <strong>davetli yönetimi</strong> gibi unsurlar üzerinde durularak, kapsamlı bir <strong>proje planı</strong> oluşturulmuştur. Ayrıca <strong>zaman çizelgesi, görev dağılımı</strong> ve <strong>kritik yol analizi</strong> gibi yönetim araçları kullanılarak projenin uygulanabilirliği değerlendirilmiştir. Bu süreç, <strong>proje yönetimiyle ilgili teorik bilgi ve becerilerimi geliştirmeme katkı sağlamıştır.</strong>
+            </p>
+            <div class="role-box">
+                <strong>Bu projede sunum hazırlama, Proje Yöneticiliği, Lojistik Yöneticiliği ve Medya & İletişim Yöneticiliği rollerini üstlendim.</strong>
+            </div>
+            <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                <strong>Orijinal Dil:</strong>
+                <img src="{% static 'en.png' %}" alt="Türk Bayrağı" style="height: 1.5em; vertical-align: middle;">
+            </div>
+        </div>
+        <!-- 9. Proje: Regresyon -->
+        <div class="project-box box-short" data-project-id="regresyon">
+            <a href="{% url 'proje_regresyon' %}" class="project-button">
+                ENM310 - Deney Tasarımı ve Regresyon Analizi: ÇAY - SICAKLIK - ZAMAN
+            </a>
+            <p class="project-desc">
+                ENM310 - Deney Tasarımı ve Regresyon Analizi dersi kapsamında, <strong>çayın farklı koşullarda demlenmesinin tat üzerindeki etkilerini</strong> inceleyen bir proje çalışması yürütülmüştür. <strong>Çayın türü, suyun sıcaklığı</strong> ve <strong>demleme süresi</strong> olmak üzere üç farklı faktör ve bu faktörlerin iki düzeydeki etkileri analiz edilmiştir. <strong>Tat puanı,</strong> çıktı değişkeni olarak ele alınmış ve <strong>varyans analizi, etkileşim grafikleri</strong> ve <sstrong>Tukey testi</strong> gibi istatistiksel yöntemlerle değerlendirmeler yapılmıştır. Elde edilen bulgulara göre, <strong>her üç faktörün de çayın tadı üzerinde istatistiksel olarak anlamlı etkileri olduğu; ancak bu faktörler arasındaki etkileşimlerin anlamlı olmadığı sonucuna ulaşılmıştır.</strong> Bu proje sayesinde, <strong>deney tasarımı ve çok faktörlü veri analizine ilişkin teorik bilgi ve analiz becerilerimi geliştirme fırsatı buldum.</strong>
+            </p>
+            <div class="role-box">
+                <strong>Bu projede üstlendiğim roller sunum hazırlamak, gerekli istatistiksel yöntemlerin hesaplamaları ve sonuçların yorumlanması şeklinde olmuştur.</strong>
+            </div>
+            <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                <strong>Orijinal Dil:</strong>
+                <img src="{% static 'tr.png' %}" alt="Türk Bayrağı" style="height: 1.5em; vertical-align: middle;">
+            </div>
+        </div>
+
+        <!-- MyWebsite -->
+        <div class="project-box box-short" data-open="website-modal-2" tabindex="0" role="button" aria-controls="website-modal-2">
+            <a href="#" class="project-button" data-open="website-modal-2">
+                Bu Portfolyo Niteliğinde Tasarladığım Website - MyWebsite
+            </a>
+            <p class="project-desc">
+
+            </p>
+            <div class="role-box">
+                <strong>Daha fazla bilgi için tıklayınız.</strong>
+            </div>
+        </div>
+
+    <!-- Sayfa Altı Navigasyon -->
+    <div class="button-wrapper">
+        <a href="{% url 'neler_yaptim' %}" class="nav-button">Önceki Sayfaya Dön</a>
+        <a href="{% url 'merhaba' %}" class="nav-button">Ana Sayfaya Dön</a>
+    </div>
+
+    <!-- Scroll Bar Script -->
+    <script>
+        window.onscroll = function () {
+            var winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+            var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            var scrolled = (winScroll / height) * 100;
+            document.getElementById("scrollProgressBar").style.width = scrolled + "%";
+
+            var scrollDown = document.getElementById("scrollDownIndicator");
+            var scrollUp = document.getElementById("scrollUpIndicator");
+
+            if (winScroll + window.innerHeight >= document.body.scrollHeight * 0.95) {
+                scrollDown.classList.add("hide-indicator");
+                scrollUp.classList.remove("hide-indicator"); // En alt kısımda scroll-up göster
+            } else {
+                scrollDown.classList.remove("hide-indicator");
+                scrollUp.classList.add("hide-indicator"); // Alt kısımda değilsek scroll-up gizle
+            }
+        };
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const downIndicator = document.getElementById("scrollDownIndicator");
+            const upIndicator = document.getElementById("scrollUpIndicator");
+
+            if (downIndicator) {
+                downIndicator.addEventListener("click", function () {
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                });
+            }
+
+            if (upIndicator) {
+                upIndicator.addEventListener("click", function () {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
+        });
+    </script>
+
+    <!-- Video Play Button Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const video = document.getElementById("customVideo");
+            const playButton = document.getElementById("playButton");
+
+            playButton.addEventListener("click", function () {
+                if (video.paused) {
+                    video.play();
+                    playButton.style.display = "none";
+                }
+            });
+
+            video.addEventListener("pause", function () {
+                playButton.style.display = "flex";
+            });
+
+            video.addEventListener("ended", function () {
+                playButton.style.display = "flex";
+            });
+        });
+    </script>
+
+    <!-- Estetik Scroll Down Indicator (SVG) -->
+    <div id="scrollDownIndicator" class="scroll-down-indicator hide-indicator" style="bottom: 100px;">
+        <svg viewBox="0 0 24 24">
+            <path d="M12 16.5c-.3 0-.5-.1-.7-.3l-6-6a1 1 0 0 1 1.4-1.4L12 14.1l5.3-5.3a1 1 0 0 1 1.4 1.4l-6 6c-.2.2-.4.3-.7.3z"/>
+        </svg>
+    </div>
+
+    <!-- Estetik Scroll Up Indicator (SVG) -->
+    <div id="scrollUpIndicator" class="scroll-down-indicator hide-indicator" style="bottom: 100px;">
+        <svg viewBox="0 0 24 24">
+            <path d="M12 7.5c.3 0 .5.1.7.3l6 6a1 1 0 0 1-1.4 1.4L12 9.9l-5.3 5.3a1 1 0 0 1-1.4-1.4l6-6c.2-.2.4-.3.7-.3z"/>
+        </svg>
+    </div>
+
+    <!-- Modal ŞABLONU -->
+    <div id="projectModal" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.8); overflow:auto;">
+        <div class="modal-content" style="background: #0f0f0f; color: white; margin: 5% auto; padding: 25px 30px; border-radius: 16px; width: 90%; max-width: 800px; font-family: 'Segoe UI', sans-serif; position:relative; box-shadow: 0 0 25px rgba(0,0,0,0.9);">
+            <span id="modalClose" style="position: absolute; top: 16px; right: 24px; font-size: 30px; cursor: pointer;">&times;</span>
+            <div id="modalContent">
+                <!-- JavaScript burayı dolduracak -->
+            </div>
+        </div>
+    </div>
+    <script>
+        const modalData = {
+            "tez": `
+            <a href="{% url 'proje_tez' %}" class="project-button" 
+            style="background-color: #ffdc34; color: black; font-weight: bold; font-size: 1.2em; padding: 10px 20px; border-radius: 10px; display: inline-block; margin-bottom: 20px; text-decoration: none;">
+                    ESKİŞEHİR TEPEBAŞI BÖLGESİNDE AKILLI TESLİMAT DOLAPLARINA ERİŞİLEBİLİRLİĞİN İYİLEŞTİRİLEREK YERLEŞTİRİLMESİ PROBLEMİ
+            </a>    
+                    </div>
+                <p style="line-height: 1.6;">
+                    Lisans Bitirme Projesi kapsamında yapılmış grup çalışmasıdır. Amaç, Küme Kapsama Problemi (Set Covering) ve TOPSIS Metoduyla
+                    <strong>Eskişehir/Tepebaşı bölgesindeki 21 adet kentsel mahalle arasından</strong> akıllı teslimat dolaplarının en uygun konumlara yerleştirilmesini
+                    amaçlayan <strong>kapsamlı bir karar destek sistemi sunmaktır.</strong> Çözüm süreci, mahallelerin demografik özelliklerine göre TOPSIS yöntemiyle
+                    önceliklendirilmesi, mahalleler arası mesafelerin hesaplanarak kapsama matrisinin oluşturulması, Set Covering optimizasyon modeliyle
+                    <strong>en az sayıda dolapla maksimum kapsamanın sağlanması</strong> ve <strong>merkezlerin önceliklendirilmesi</strong> adımlarını içerir.
+                    Görsel ve etkileşimli bir <strong>HTML arayüz aracılığıyla</strong> kapsama yarıçapı seçilebilmekte ve bu seçim doğrultusunda
+                    <strong>sistem otomatik olarak optimizasyonu gerçekleştirmektedir.</strong> Sistem tarafından saptanan merkezlerin
+                    <strong>Google Street View görüntüleri kullanıcının bir tık uzağına sunularak</strong> kullanıcı dostu ve pratik bir yapı sağlanmıştır.
+                    Elde edilen sonuçlar hem tablo hem harita olarak sunulur ve bu sayede
+                    <strong>karar vericilere erişilebilirlik, etkinlik ve öncelik bazlı yerleşim önerileri</strong> sunan dinamik ve bütünleşik bir çözüm elde edilir.
+                </p>
+
+                <div style="background-color: #2c2c2c; padding: 12px 18px; border-radius: 10px; margin-top: 20px; font-weight: bold;">
+                    Bu projedeki bireysel rollerim; ScribbleMaps ve QGIS yardımıyla mahalle sınırlarının çizimi ve coğrafi koordinatların model tarafından
+                    işlenebilir formata getirilmesi, Adobe Photoshop yardımıyla arayüz ve proje fuarı posteri için görsel oluşturmak, veri analizi,
+                    Python yardımıyla optimizasyon modeli ile kod dizlimini oluşturmak ve HTML arayüzlü bir Karar Destek Sistemi geliştirmek olmuştur.
+                </div>
+
+                <!-- Görseller -->
+                <div style="margin-top: 20px;">
+                    <img src="{% static 'documents/tez-poster.jpeg' %}" alt="Tez Poster"
+                        style="width: 100%; height: auto; max-height: 650px; object-fit: contain; border-radius: 10px; margin-bottom: 12px;">
+                    <img src="{% static 'documents/tez-1.jpeg' %}" alt="Tez Görseli 1"
+                        style="width: 100%; height: auto; max-height: 500px; object-fit: contain; border-radius: 10px;">
+                </div>
+
+                <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                    <strong>Orijinal Dil:</strong>
+                    <img src="{% static 'tr.png' %}" alt="Türkçe" style="height: 1.5em; vertical-align: middle;">
+                </div>
+            `,
+        "staj": `
+            <style>
+                /* Modal açıldığında sadece video oynat butonunu gizle */
+                .video-container #playButton {
+                    display: none !important;
+                }
+            </style>
+
+            <a href="{% url 'proje_staj' %}" class="project-button" 
+            style="background-color: #ffdc34; color: black; font-weight: bold; font-size: 1.2em; padding: 10px 20px; border-radius: 10px; display: inline-block; margin-bottom: 20px; text-decoration: none;">
+                EnerjiSA - SPARK'24: DAĞITIM ŞEBEKELERİNDE GÜÇ TRAFOLARININ PARALEL BAĞLANMA PRENSİPLERİ
+            </a>
+
+            <p style="line-height: 1.6;">
+                02.07.2024 - 30.07.2024 tarihleri arasında EnerjiSA - Toroslar EDAŞ bünyesinde yapmış olduğum Zorunlu Yönetim Stajım kapsamında grup arkadaşlarım ve grup koçumuz Ahmet CANBOLAT ile birlikte gerçekleştirdiğimiz projede üstlendiğim kısımlar ve gerçekleştirmiş olduğum çalışmaları içermektedir. Amaç, Dağıtım Şebekelerinde <strong>Güç Trafolarının Paralel Bağlanma Prensipleri</strong> doğrultusunda Mersin Metropol Bölgesinde yer alan <strong>14 indirici merkezin gözlemlenen puant değerlerine sıcaklık ve nem oranının</strong> etkisi olup olmadığını saptayarak tahminleme olanakları sağlamak ve çıktıları analiz etmek olmuştur. Bu bağlamda <strong>01.01.2023 – 30.06.2024 aralığındaki günlük puant değerleri ve trafo kapasiteleri, günlük ortalama sıcaklık değerleri ve günlük ortalama nem oranları</strong> verileri kullanılmıştır.
+            </p>
+
+            <div style="background-color: #2c2c2c; padding: 12px 18px; border-radius: 10px; margin-top: 20px; font-weight: bold;">
+                Bu projedeki bireysel rollerim; verilerin çekilmesi ve işlenmeye hazır hale getirilmesi, sıcaklık ve nem oranlarının puant değerleri üzerindeki etkilerini incelemek üzere Python diliyle regresyon analizlerinin gerçekleştirilmesi, her bir trafoya ait regresyon denklemlerinin çıkarılması ve bu denklemlerle Parametre Bazlı Güç Tahminleyicisi geliştirilmesidir. Ayrıca, tahmin sonuçları doğrultusunda enerji verimliliği hesaplamaları yapılmış, aktif ortalama güç ve ortalama doluluk oranı kriterlerine göre Pareto analiziyle kritik trafolar belirlenmiş ve tüm bu sürecin görsel sunumu ile proje tanıtım videosu hazırlanmıştır.    
+            </div>
+
+            <!-- Görseller -->
+            <div style="margin-top: 20px;">
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <img src="{% static 'documents/spark-sunumgrup.jpeg' %}" alt="Sunum Grubu" style="width: 50%; border-radius: 10px;">
+                    <img src="{% static 'documents/spark-r-p.jpeg' %}" alt="Regresyon Puan" style="width: 50%; border-radius: 10px;">
+                </div>
+
+                <!-- Video Container -->
+                <div class="video-container" style="position: relative; max-width: 100%; border-radius: 10px; overflow: hidden; margin-bottom: 15px;">
+                    <video id="customVideo" preload="metadata" controls style="width: 100%; border-radius: 10px;">
+                        <source src="{% static 'documents/spark-anim.mp4' %}" type="video/mp4">
+                        Tarayıcınız video etiketini desteklemiyor.
+                    </video>
+                    <div id="playButton" class="play-button" title="Oynat" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                        display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; background-color: rgba(0,0,0,0.5); border-radius: 50%; cursor: pointer;">
+                        <svg viewBox="0 0 24 24" fill="white" width="36" height="36">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <img src="{% static 'documents/spark-rs.jpeg' %}" alt="Regresyon Sıcaklık" 
+                    style="width: 100%; height: 560px; border-radius: 15px; object-fit: fill;">
+            </div>
+
+            <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                <strong>Orijinal Dil:</strong>
+                <img src="{% static 'tr.png' %}" alt="Türkçe" style="height: 1.5em; vertical-align: middle;">
+            </div>
+        `,
+            "vb": `
+                <a href="{% url 'proje_veri' %}" class="project-button" 
+                style="background-color: #ffdc34; color: black; font-weight: bold; font-size: 1.2em; padding: 10px 20px; border-radius: 10px; display: inline-block; margin-bottom: 20px;">
+                    ENM421 - Veri Bilimine Giriş: KALP HASTALIĞI TESPİTİ
+                </a>      
+                <p style="line-height: 1.6;">
+                    Bu çalışma, ENM421 - Veri Bilimine Giriş dersi kapsamında gerçekleştirilmiştir. Projede, kalp hastalığı verileri analiz edilerek <strong>eksik değer kontrolü, değişkenlerin standartlaştırılması</strong> ve <strong>görselleştirme</strong> adımları uygulanmıştır. Ardından, veriler <strong>eğitim</strong> ve <strong>test</strong> olarak ikiye ayrılmış ve <strong>Rastgele Orman (Random Forest)</strong> algoritmasıyla bir <strong>sınıflandırma modeli geliştirilmiştir.</strong> Modelin performansı <strong>karışıklık matrisi, doğruluk oranı, precision, recall</strong> ve <strong>F1 skoru gibi metriklerle</strong> değerlendirilmiştir. Ayrıca, <strong>modelin hangi değişkenlere daha çok önem verdiği analiz edilmiş</strong> ve sonuçlar bir JSON dosyasına kaydedilmiştir. Bu proje ile, <strong>veri bilimi teknikleri kullanılarak kalp hastalığını tahmin etmeye yönelik başarılı bir model oluşturulmuştur.</strong>
+                </p>
+                <div style="background-color: #2c2c2c; padding: 12px 18px; border-radius: 10px; margin-top: 20px; font-weight: bold;">
+                    Bu proje bireysel bir çalışma olduğundan ötürü bütün dosyalar ve çalışmalar tarafıma aittir.
+                </div>
+                <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                    <strong>Orijinal Dil:</strong>
+                    <img src="{% static 'tr.png' %}" alt="Türkçe" style="height: 1.5em; vertical-align: middle;">
+                </div>
+            `,
+            "sasa1": `
+                <a href="{% url 'proje_sasamakro' %}" class="project-button" 
+                style="background-color: #ffdc34; color: black; font-weight: bold; font-size: 1.2em; padding: 10px 20px; border-radius: 10px; display: inline-block; margin-bottom: 20px;">
+                    SASA POLYESTER A.Ş. - EXCEL VBA & MAKRO İLE ELYAF ÜRETİM PLANLAMASI SÜRECİNE YÖNELİK İYİLEŞTİRME ÇALIŞMALARI                 </a>      
+                <p style="line-height: 1.6;">
+                    01.07.2025 - 30.07.2025 tarihleri arasında <strong>SASA POLYESTER A.Ş. bünyesinde yapmış olduğum Zorunlu Üretim Stajım</strong> kapsamında yapmış olduğum çalışmamdaki <strong>Excel VBA kodları ve Makro atamaları</strong>, Excel dosyalarında günlük üretim planlarını ve <strong>SAP'den indirilen verileri otomatik olarak yönetmek, güncellemek ve düzenlemek</strong> için geliştirilmiştir. Kodlar; günün tarihini otomatik olarak vurgulama, SAP sisteminden indirilen stok, sevkiyat ve bakiye dosyalarından güncel verileri filtreleyip ilgili sayfalara aktarma, veri bütünlüğünü sağlama, ürün kodlarını doğrulama ve eksik girişleri uyarma gibi görevleri otomatikleştirerek <strong>manuel işlemleri ortadan kaldırmaktadır.</strong> Bu çalışma, süreçlerin hızlandırılması, hata oranlarının düşürülmesi ve veri doğruluğunun artırılması amacıyla SASA Polyester'deki stajım süresince gerçekleştirdiğim <strong>süreç iyileştirme çalışmalarının bir parçası olarak hazırlanmıştır.</strong>
+                </p>
+                <div style="background-color: #2c2c2c; padding: 12px 18px; border-radius: 10px; margin-top: 20px; font-weight: bold;">
+                    Bu proje bireysel bir çalışma olduğundan ötürü bütün dosyalar ve çalışmalar tarafıma aittir.
+                </div>
+                <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                    <strong>Orijinal Dil:</strong>
+                    <img src="{% static 'tr.png' %}" alt="Türkçe" style="height: 1.5em; vertical-align: middle;">
+                </div>
+            `,
+
+            "network": `
+                <a href="{% url 'proje_network' %}" class="project-button" 
+                style="background-color: #ffdc34; color: black; font-weight: bold; font-size: 1.2em; padding: 10px 20px; border-radius: 10px; display: inline-block; margin-bottom: 20px;">
+                    ENM326 - Ağ Optimizasyonu ve Algoritmaları: HEMŞİRE PERSONEL PLANLAMASI
+                </a>      
+                <p style="line-height: 1.6;">
+                    Bu çalışma, ENM326 - Ağ Optimizasyonu ve Algoritmaları dersi kapsamında gerçekleştirilmiştir. Projede, <strong>farklı vardiyalar</strong> ve <strong>departmanlar için hemşire ihtiyacı</strong>,<strong> kapasite sınırları</strong> ve <strong>talepler</strong> göz önünde bulundurularak bir <strong>maksimum akış optimizasyon modeli</strong> kurulmuştur. Modelde, <strong>vardiya</strong> ve <strong>departmanlar</strong> arasındaki <strong>akış değişkenleri</strong> tanımlanmış, <strong>üst-alt sınırlar</strong> ile <strong>talep kısıtlamaları</strong> eklenmiş ve <strong>toplam hemşire sayısını minimize edecek şekilde amaç fonksiyonu belirlenmiştir</strong>. Model <strong>Gurobi</strong> ile çözülmüş, elde edilen <strong>optimal akış değerleri yorumlanmış</strong> ve <strong>sonuçlar detaylı bir ağ grafiği ile katmanlı olarak görselleştirilmiştir</strong>. Böylece, <strong>hemşirelerin vardiya ve departmanlara dağılımı optimize edilerek kaynak kullanımı etkin hale getirilmiştir</strong>
+                </p>
+                <div style="background-color: #2c2c2c; padding: 12px 18px; border-radius: 10px; margin-top: 20px; font-weight: bold;">
+                    Bu projede, kodlama sürecini yürütmek, raporu hazırlamak ve sunumu oluşturmak sorumluluklarını üstlendim. Ayrıca, ağ simülasyonlarının gerçekleştirilmesi ve performans analizlerinin yapılması görevlerini de yerine getirdim.
+                </div>
+                <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                    <strong>Orijinal Dil:</strong>
+                    <img src="{% static 'en.png' %}" alt="Türkçe" style="height: 1.5em; vertical-align: middle;">
+                </div>
+            `,
+
+            "pp": `
+                <a href="{% url 'proje_project_planning' %}" class="project-button" 
+                style="background-color: #ffdc34; color: black; font-weight: bold; font-size: 1.2em; padding: 10px 20px; border-radius: 10px; display: inline-block; margin-bottom: 20px;">
+                    ENM448 - Proje Planlama ve Yönetimi: FİLM GALASI ETKİNLİĞİ
+                </a>      
+                <p style="line-height: 1.6;">
+                    ENM448 - Proje Planlama ve Yönetimi dersi kapsamında, bir film galası organizasyonunu temel alan <strong>örnek bir proje yönetimi</strong> tasarlanmıştır. Bu kapsamda, proje yönetiminin temel adımları olan <strong>planlama, organizasyon</strong> ve <strong>yürütme</strong> süreçleri detaylı biçimde analiz edilmiştir. <strong>Mekan seçimi, güvenlik önlemleri, medya ve tanıtım faaliyetleri, teknik altyapı gereksinimleri, lojistik hizmetler</strong> ve <strong>davetli yönetimi</strong> gibi unsurlar üzerinde durularak, kapsamlı bir <strong>proje planı</strong> oluşturulmuştur. Ayrıca <strong>zaman çizelgesi, görev dağılımı</strong> ve <strong>kritik yol analizi</strong> gibi yönetim araçları kullanılarak projenin uygulanabilirliği değerlendirilmiştir. Bu süreç, <strong>proje yönetimiyle ilgili teorik bilgi ve becerilerimi geliştirmeme katkı sağlamıştır.</strong>
+                </p>
+                <div style="background-color: #2c2c2c; padding: 12px 18px; border-radius: 10px; margin-top: 20px; font-weight: bold;">
+                    Bu projede sunum hazırlama, Proje Yöneticiliği, Lojistik Yöneticiliği ve Medya & İletişim Yöneticiliği rollerini üstlendim.
+                </div>
+                <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                    <strong>Orijinal Dil:</strong>
+                    <img src="{% static 'en.png' %}" alt="Türkçe" style="height: 1.5em; vertical-align: middle;">
+                </div>
+            `,
+            "regresyon": `
+                <a href="{% url 'proje_regresyon' %}" class="project-button" 
+                style="background-color: #ffdc34; color: black; font-weight: bold; font-size: 1.2em; padding: 10px 20px; border-radius: 10px; display: inline-block; margin-bottom: 20px;">
+                    ENM310 - Deney Tasarımı ve Regresyon Analizi: ÇAY - SICAKLIK - ZAMAN
+                </a>
+                
+                <p style="line-height: 1.6;">
+                    ENM310 - Deney Tasarımı ve Regresyon Analizi dersi kapsamında, <strong>çayın farklı koşullarda demlenmesinin tat üzerindeki etkilerini</strong> inceleyen bir proje çalışması yürütülmüştür. <strong>Çayın türü, suyun sıcaklığı</strong> ve <strong>demleme süresi</strong> olmak üzere üç farklı faktör ve bu faktörlerin iki düzeydeki etkileri analiz edilmiştir. <strong>Tat puanı,</strong> çıktı değişkeni olarak ele alınmış ve <strong>varyans analizi, etkileşim grafikleri</strong> ve <sstrong>Tukey testi</strong> gibi istatistiksel yöntemlerle değerlendirmeler yapılmıştır. Elde edilen bulgulara göre, <strong>her üç faktörün de çayın tadı üzerinde istatistiksel olarak anlamlı etkileri olduğu; ancak bu faktörler arasındaki etkileşimlerin anlamlı olmadığı sonucuna ulaşılmıştır.</strong> Bu proje sayesinde, <strong>deney tasarımı ve çok faktörlü veri analizine ilişkin teorik bilgi ve analiz becerilerimi geliştirme fırsatı buldum.</strong>
+                </p>
+                <div style="background-color: #2c2c2c; padding: 12px 18px; border-radius: 10px; margin-top: 20px; font-weight: bold;">
+                    Bu projede üstlendiğim roller sunum hazırlamak, gerekli istatistiksel yöntemlerin hesaplamaları ve sonuçların yorumlanması şeklinde olmuştur.
+                </div>
+                <div style="margin-top: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                    <strong>Orijinal Dil:</strong>
+                    <img src="{% static 'tr.png' %}" alt="Türkçe" style="height: 1.5em; vertical-align: middle;">
+                </div>
+            `
+            // Diğer projeler için buraya eklemeler yapılabilir.
+        };
+    </script>
+
+    <!-- Modal Davranışı -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const modal = document.getElementById("projectModal");
+            const modalContent = document.getElementById("modalContent");
+            const modalClose = document.getElementById("modalClose");
+
+            document.querySelectorAll(".project-box[data-project-id]").forEach(box => {
+                box.addEventListener("click", () => {
+                    const id = box.getAttribute("data-project-id");
+                    modalContent.innerHTML = modalData[id] || "<p>İçerik bulunamadı.</p>";
+                    modal.style.display = "block";
+                });
+            });
+
+            modalClose.addEventListener("click", () => {
+                modal.style.display = "none";
+            });
+
+            window.addEventListener("click", (event) => {
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+        });
+    </script>
+
+        <!-- MyWebsite Modal-2 -->
+        <div id="website-modal-2" class="modal-2-overlay">
+            <div class="modal-2-content">
+                <span class="modal-2-close" id="website-modal-2-close">&times;</span>
+                <img src="{% static 'erhan-1.jpeg' %}" alt="Erhan" class="center-image-modal-2">
+                <h2>Bu web sitesi hakkında sizinle ufuk açıcı bir sohbet gerçekleştirmek ve değerli görüşlerinizle projeme yeni renkler katmak benim için büyük bir onur olacaktır &#128522;</h2>
+                <p>
+                    <!-- Envelope icon -->
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M2 4h20v16H2z" fill="none"/>
+                        <path d="M22 6l-10 7L2 6V6h20zM2 18V8l10 7 10-7v10H2z"/>
+                    </svg>
+                    <a href="mailto:erhan.simseker33@gmail.com">erhan.simseker33@gmail.com</a>
+                </p>
+                <p>
+                    <!-- Phone icon -->
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M6.62 10.79a15.091 15.091 0 006.59 6.59l2.2-2.2a1 1 0 01.94-.27c1.12.27 2.33.42 3.57.42a1 1 0 011 1v3.5a1 1 0 01-1 1C10.07 21.5 2.5 13.93 2.5 4.5a1 1 0 011-1H7a1 1 0 011 1c0 1.24.15 2.45.42 3.57a1 1 0 01-.27.94l-2.2 2.2z"/>
+                    </svg>
+                    <a href="tel:+905518293149">+90 551 829 31 49</a>
+                </p>
+                <p>
+                    <!-- LinkedIn icon -->
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M4.98 3.5C3.34 3.5 2 4.84 2 6.48s1.34 2.98 2.98 2.98 2.98-1.34 2.98-2.98S6.62 3.5 4.98 3.5zM2.4 21.5h5.16V9H2.4v12.5zM9.84 9h4.95v1.71h.07c.69-1.3 2.37-2.67 4.88-2.67 5.22 0 6.18 3.43 6.18 7.89V21.5h-5.16v-6.99c0-1.67-.03-3.83-2.33-3.83-2.33 0-2.68 1.82-2.68 3.71V21.5H9.84V9z"/>
+                    </svg>
+                    <a href="https://www.linkedin.com/in/erhansimseker" target="_blank" rel="noopener noreferrer">
+                        www.linkedin.com/in/erhansimseker
+                    </a>
+                </p>
+            </div>
+        </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const triggers = document.querySelectorAll('[data-open="website-modal-2"]');
+        const modal = document.getElementById('website-modal-2');
+        const closeBtn = modal.querySelector('.modal-2-close');
+
+        function openModal() {
+            modal.classList.add('active');
+            modal.setAttribute('aria-hidden', 'false');
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+
+        // Tıklama ile açma
+        triggers.forEach(trigger => {
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                openModal();
+            });
+        });
+
+        // Kapatma butonu
+        closeBtn.addEventListener('click', closeModal);
+
+        // Overlay'e tıklayınca kapatma
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // ESC ile kapatma
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+    });
+    </script>
+
+
+</body>
+</html>
